@@ -1,2 +1,0 @@
-# cinema-app
-cinema-app
