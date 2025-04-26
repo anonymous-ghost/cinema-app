@@ -3,24 +3,27 @@ import { useState } from "react";
 export default function FilmsCard() {
   const [like, setLike] = useState(true);
 
-  function liked(e){
-    e.preventDefault()
-    setLike(!like)
+  function liked(e) {
+    e.preventDefault();
+    setLike(!like);
   }
   return (
     <a href="#" className="films-card">
-      <button
-        onClick={liked}
-        className={like ? "toggle-heart" : "toggle-heart liked"}
-        id="toggle-heart"
-        aria-label="like"
-      >
-        ❤
-      </button>
+      <div className="heart-background">
+        <button
+          onClick={liked}
+          className={like ? "toggle-heart" : "toggle-heart liked"}
+          id="toggle-heart"
+          aria-label="like"
+        >
+          ❤
+        </button>
+      </div>
       <img
         src="https://new.kinogo.fm/uploads/posts/2022-03/251733_1647372642.webp"
         alt=""
       />
+      <img />
       <div className="films-info-card">
         <span className="film-name">Avatar</span>
         <div className="movie-rating">
