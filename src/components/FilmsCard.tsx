@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-export default function FilmsCard() {
-  const [like, setLike] = useState(true);
+const FilmsCard = () => {
+  const [like, setLike] = useState<boolean>(true);
 
-  function liked(e) {
+  function liked(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     setLike(!like);
   }
@@ -38,4 +38,6 @@ export default function FilmsCard() {
       </div>
     </a>
   );
-}
+};
+
+export default FilmsCard;

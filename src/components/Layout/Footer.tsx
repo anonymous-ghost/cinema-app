@@ -1,4 +1,4 @@
-export default function Footer() {
+const Footer = () => {
   return (
     <>
       <footer>
@@ -40,8 +40,12 @@ export default function Footer() {
             </a>
           </div>
         </div>
-        <div className="footer-bottom">© 2025 MovieApp. All rights reserved.</div>
+        <div className="footer-bottom">
+          © 2025 MovieApp. All rights reserved.
+        </div>
       </footer>
     </>
   );
-}
+};
+
+export default Footer;
