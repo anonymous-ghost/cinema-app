@@ -4,6 +4,7 @@ import Footer from "./components/Layout/Footer";
 import Header from "./components/Layout/Header";
 import Home from "./Pages/Home";
 import AdminPanel from "./Pages/AdminPanel";
+import Favorites from "./Pages/Favorites";
 
 const App = () => {
   return (
@@ -12,6 +13,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<AdminPanel />} />
+        <Route path="/favorites" element={<Favorites />} />
       </Routes>
       <Footer />
     </BrowserRouter>
