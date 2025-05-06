@@ -71,10 +71,10 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: #e2264d;
   color: white;
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -82,6 +82,9 @@
   border: none;
   cursor: pointer;
   font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  font-family: Arial, sans-serif;
   opacity: 0;
   transition: opacity 0.3s ease, background-color 0.2s ease;
 }
@@ -91,7 +94,7 @@
 }
 
 .remove-favorite-btn:hover {
-  background-color: #e50914;
+  background-color: #ff3b5c;
 }
 
 /* Інформація про фільм */
@@ -144,44 +147,51 @@
 /* Стиль для порожнього списку обраних */
 .empty-favorites {
   text-align: center;
-  padding: 5rem 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+  padding: 4rem 1rem;
+  color: white;
   background-color: #171717;
   border-radius: 12px;
+  max-width: 500px;
   margin: 2rem auto;
-  max-width: 600px;
-}
-
-.empty-favorites-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+  font-family: 'Roboto', sans-serif;
 }
 
 .empty-favorites h2 {
-  font-size: 24px;
-  margin: 0;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
 }
 
 .empty-favorites p {
   color: #838383;
-  margin: 0.5rem 0 2rem;
+  margin-bottom: 1.5rem;
+  font-size: 15px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+}
+
+.empty-favorites-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
 }
 
 .browse-movies-btn {
-  background-color: #e50914;
+  display: inline-block;
+  background-color: #171717;
+  border: 1px solid #333;
   color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
   text-decoration: none;
-  padding: 10px 24px;
-  border-radius: 4px;
-  font-weight: 600;
-  transition: background-color 0.2s ease;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  transition: background-color 0.2s;
 }
 
 .browse-movies-btn:hover {
-  background-color: #f40612;
+  background-color: #252525;
 }
 
 /* Loading spinner */
@@ -196,11 +206,11 @@
 }
 
 .loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(255, 255, 255, 0.3);
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;
-  border-top-color: #e50914;
+  border-top-color: #999;
   animation: spin 1s ease-in-out infinite;
 }
 
@@ -220,6 +230,16 @@
   .favorite-poster {
     height: 280px;
   }
+
+  .pagination {
+    margin-top: 1rem;
+  }
+  
+  .page-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -230,6 +250,126 @@
   }
   
   .empty-favorites {
-    padding: 3rem 1rem;
+    padding: 2.5rem 1rem;
   }
+  
+  .empty-favorites h2 {
+    font-size: 1.2rem;
+  }
+  
+  .empty-favorites p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Styles for Favorites page that match the Home page */
+.favorites-container {
+  min-height: 100vh; /* Ensure the container takes at least the full viewport height */
+}
+
+.favorites-list {
+  /* Most styles come from .films in index.css, we just add some specific to favorites */
+  min-height: 70vh; /* Smaller min-height than home page since we might have fewer films */
+}
+
+/* Empty favorites styling */
+.empty-favorites-wrapper {
+  min-height: 70vh; /* Ensure proper footer placement */
+  padding-bottom: 30px;
+}
+
+/* Poster wrapper */
+.poster-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Date added label - позиціонування зверху зображення */
+.date-added {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 6px 8px;
+  font-size: 12px;
+  color: #fff;
+  box-sizing: border-box;
+  z-index: 1; /* Знижений z-index щоб сердечко було зверху */
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+}
+
+/* Об'єднання фону сердечка з датою */
+.heart-background {
+  background-color: rgba(0, 0, 0, 0.75); /* Той самий фон, що й для дати */
+  border-radius: 20px;
+  padding-left: 2px;
+  position: absolute;
+  width: 23px;
+  height: 32px;
+  right: 0px;
+  top: 0px; /* Розміщення у верхньому куті */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2; /* Вище ніж дата */
+}
+
+/* Heart button styles for favorites */
+.remove-favorite .toggle-heart {
+  color: #e2264d !important;
+  -webkit-filter: none !important;
+  filter: none !important;
+  opacity: 1;
+}
+
+/* Ensure heart icon is visible */
+.heart-background.remove-favorite {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Pagination styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin: 1rem auto 2rem;
+  gap: 10px;
+  padding-bottom: 2rem;
+}
+
+.page-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background-color: #171717;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-family: 'Roboto', sans-serif;
+  transition: background-color 0.2s;
+}
+
+.page-btn.active {
+  background-color: #e50914;
+}
+
+.page-btn:hover:not(.active) {
+  background-color: #333;
+}
+
+/* Make sure all text uses Roboto except headings */
+.text-current {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
 }
