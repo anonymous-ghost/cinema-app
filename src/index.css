@@ -203,12 +203,12 @@ header {
   position: relative;
   color: white;
   background-color: #171717;
-  width: 200px;
+  width: 220px;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
   transition: transform 0.3s ease;
-  height: 430px;
+  height: 450px;
 }
 
 .films-card:hover {
@@ -229,9 +229,20 @@ header {
   gap: 10px;
 }
 
+.film-title-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
 .film-name {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
+  font-family: "Roboto", sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .movie-rating {
@@ -406,4 +417,41 @@ header {
   transform: translateX(100%);
   width: 0;
   transition: all 0.4s ease;
+}
+
+.poster-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.poster-wrapper img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.new-release-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #E50914;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+.new-badge-small {
+  display: inline-block;
+  background-color: #E50914;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 3px;
+  vertical-align: middle;
 }

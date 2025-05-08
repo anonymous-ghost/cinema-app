@@ -4,9 +4,11 @@ import Footer from "./components/Layout/Footer";
 import Header from "./components/Layout/Header";
 import Home from "./Pages/Home";
 import AdminPanel from "./Pages/AdminPanel";
+import { FilmsProvider } from "./contexts/FilmsContext";
 
 const App = () => {
   return (
+    <FilmsProvider>
     <BrowserRouter>
       <Header />
       <Routes>
@@ -15,6 +17,7 @@ const App = () => {
       </Routes>
       <Footer />
     </BrowserRouter>
+    </FilmsProvider>
   );
 };
 export default App;

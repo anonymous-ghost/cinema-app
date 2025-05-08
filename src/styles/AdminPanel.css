@@ -663,4 +663,17 @@ body {
   }
   
   .netflix-table .actions-column {width: 40%; }
+}
+
+.new-badge {
+  display: inline-block;
+  background-color: var(--netflix-red);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  vertical-align: middle;
+  letter-spacing: 0.5px;
 } 

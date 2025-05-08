@@ -5,112 +5,117 @@ import "../styles/AdminPanel.css";
 import "../styles/FormStyles.css";
 import "../styles/ActionButtons.css";
 import { Link } from 'react-router-dom';
+import { useFilms } from "../contexts/FilmsContext";
+import { sortFilms } from "../utils/filmSort";
 
-const MOCK_FILMS: Film[] = [
+export const MOCK_FILMS: Film[] = [
   {
     id: "1",
     title: "Magic travel to Archem",
     description: "Jake Sully lives with his newfound family formed on the planet of Pandora.",
     posterUrl: "https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjQxNTE1MDA@._V1_FMjpg_UX1000_.jpg",
     cast: ["Sam Worthington", "Zoe Saldana"],
-    year: 2024,
+    year: 2025,
     genres: ["Fantasy", "Adventure", "Magic"],
     rating: 8.8,
-    trailerUrl: "https://www.youtube.com/watch?v=d9MyW72ELq0"
+    trailerUrl: "https://www.youtube.com/watch?v=d9MyW72ELq0",
+    isNew: true
   },
   {
     id: "2",
-    title: "Magic travel to Archem",
+    title: "Magic travel to Archem 2",
     description: "When a sadistic serial killer begins murdering key political figures in Gotham, Batman is forced to investigate.",
     posterUrl: "https://m.media-amazon.com/images/M/MV5BMDdmMTBiNTYtMDIzNi00NGVlLWIzMDYtZTk3MTQ3NGQxZGEwXkEyXkFqcGdeQXVyMzMwOTU5MDk@._V1_.jpg",
     cast: ["Robert Pattinson", "Zoë Kravitz"],
     year: 2024,
     genres: ["Fantasy", "Adventure", "Magic"],
     rating: 8.8,
-    trailerUrl: "https://www.youtube.com/watch?v=mqqft2x_Aa4"
+    trailerUrl: "https://www.youtube.com/watch?v=mqqft2x_Aa4",
+    isNew: true
   },
   {
     id: "3",
-    title: "Inception",
-    description: "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
-    posterUrl: "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg",
-    cast: ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Ellen Page"],
-    year: 2010,
-    genres: ["Sci-Fi", "Action", "Thriller"],
-    rating: 8.8,
-    trailerUrl: "https://www.youtube.com/watch?v=YoHD9XEInc0"
+    title: "Dune: Part Two",
+    description: "Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family.",
+    posterUrl: "https://m.media-amazon.com/images/M/MV5BODdjMjM3NGQtZDA5OC00NGE4LWIyZDQtZjYwOGZlMTM5ZTQ1XkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_.jpg",
+    cast: ["Timothée Chalamet", "Zendaya", "Rebecca Ferguson"],
+    year: 2023,
+    genres: ["Sci-Fi", "Action", "Adventure"],
+    rating: 8.5,
+    trailerUrl: "https://www.youtube.com/watch?v=Way9Dexny3w",
+    isNew: true
   },
   {
     id: "4",
-    title: "The Shawshank Redemption",
-    description: "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
-    posterUrl: "https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg",
-    cast: ["Tim Robbins", "Morgan Freeman"],
-    year: 1994,
-    genres: ["Drama"],
-    rating: 9.3,
-    trailerUrl: "https://www.youtube.com/watch?v=6hB3S9bIaco"
+    title: "Oppenheimer",
+    description: "The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb.",
+    posterUrl: "https://m.media-amazon.com/images/M/MV5BMDBmYTZjNjUtN2M1MS00MTQ2LTk2ODgtNzc2M2QyZGE5NTVjXkEyXkFqcGdeQXVyNzAwMjU2MTY@._V1_.jpg",
+    cast: ["Cillian Murphy", "Emily Blunt", "Matt Damon"],
+    year: 2023,
+    genres: ["Biography", "Drama", "History"],
+    rating: 8.9,
+    trailerUrl: "https://www.youtube.com/watch?v=uYPbbksJxIg"
   },
   {
     id: "5",
-    title: "The Dark Knight",
-    description: "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.",
-    posterUrl: "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg",
-    cast: ["Christian Bale", "Heath Ledger", "Aaron Eckhart"],
-    year: 2008,
-    genres: ["Action", "Crime", "Drama"],
-    rating: 9.0,
-    trailerUrl: "https://www.youtube.com/watch?v=EXeTwQWrcwY"
+    title: "After. Happily ever after",
+    description: "The fourth and final installment in the 'After' film series, following the passionate yet turbulent relationship of Tessa Young and Hardin Scott as they face the aftermath of their breakup and the possibility of a future together.",
+    posterUrl: "/posters/after-happily-ever-after-16155.jpg",
+    cast: ["Josephine Langford", "Hero Fiennes Tiffin", "Louise Lombard"],
+    year: 2022,
+    genres: ["Drama", "Romance"],
+    rating: 7.9,
+    trailerUrl: "https://www.youtube.com/watch?v=3stfdUnMGP0"
   },
   {
     id: "6",
-    title: "Pulp Fiction",
-    description: "The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.",
-    posterUrl: "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg",
-    cast: ["John Travolta", "Uma Thurman", "Samuel L. Jackson"],
-    year: 1994,
-    genres: ["Crime", "Drama"],
-    rating: 8.9,
-    trailerUrl: "https://www.youtube.com/watch?v=s7EdQ4FqbhY"
+    title: "The Batman",
+    description: "When a sadistic serial killer begins murdering key political figures in Gotham, Batman is forced to investigate the city's hidden corruption and question his family's involvement.",
+    posterUrl: "https://m.media-amazon.com/images/M/MV5BMDdmMTBiNTYtMDIzNi00NGVlLWIzMDYtZTk3MTQ3NGQxZGEwXkEyXkFqcGdeQXVyMzMwOTU5MDk@._V1_.jpg",
+    cast: ["Robert Pattinson", "Zoë Kravitz", "Jeffrey Wright"],
+    year: 2022,
+    genres: ["Action", "Crime", "Drama"],
+    rating: 8.3,
+    trailerUrl: "https://www.youtube.com/watch?v=mqqft2x_Aa4"
   },
   {
     id: "7",
-    title: "The Matrix",
-    description: "A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.",
-    posterUrl: "https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg",
-    cast: ["Keanu Reeves", "Laurence Fishburne", "Carrie-Anne Moss"],
-    year: 1999,
-    genres: ["Action", "Sci-Fi"],
-    rating: 8.7,
-    trailerUrl: "https://www.youtube.com/watch?v=vKQi3bBA1y8"
+    title: "Spider-Man: No Way Home",
+    description: "With Spider-Man's identity now revealed, Peter asks Doctor Strange for help. When a spell goes wrong, dangerous foes from other worlds start to appear, forcing Peter to discover what it truly means to be Spider-Man.",
+    posterUrl: "https://m.media-amazon.com/images/M/MV5BZWMyYzFjYTYtNTRjYi00OGExLWE2YzgtOGRmYjAxZTU3NzBiXkEyXkFqcGdeQXVyMzQ0MzA0NTM@._V1_.jpg",
+    cast: ["Tom Holland", "Zendaya", "Benedict Cumberbatch"],
+    year: 2021,
+    genres: ["Action", "Adventure", "Fantasy"],
+    rating: 8.2,
+    trailerUrl: "https://www.youtube.com/watch?v=JfVOs4VSpmA"
   },
   {
     id: "8",
-    title: "Forrest Gump",
-    description: "The presidencies of Kennedy and Johnson, the events of Vietnam, Watergate, and other historical events unfold through the perspective of an Alabama man with an IQ of 75.",
-    posterUrl: "https://m.media-amazon.com/images/M/MV5BNWIwODRlZTUtY2U3ZS00Yzg1LWJhNzYtMmZiYmEyNmU1NjMzXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg",
-    cast: ["Tom Hanks", "Robin Wright", "Gary Sinise"],
-    year: 1994,
-    genres: ["Drama", "Romance"],
-    rating: 8.8,
-    trailerUrl: "https://www.youtube.com/watch?v=bLvqoHBptjg"
+    title: "Parasite",
+    description: "Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.",
+    posterUrl: "https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_.jpg",
+    cast: ["Song Kang-ho", "Lee Sun-kyun", "Cho Yeo-jeong"],
+    year: 2019,
+    genres: ["Drama", "Thriller"],
+    rating: 8.5,
+    trailerUrl: "https://www.youtube.com/watch?v=5xH0HfJHsaY"
   },
   {
     id: "9",
-    title: "The Lord of the Rings: The Fellowship of the Ring",
-    description: "A meek Hobbit from the Shire and eight companions set out on a journey to destroy the powerful One Ring and save Middle-earth from the Dark Lord Sauron.",
-    posterUrl: "https://m.media-amazon.com/images/M/MV5BN2EyZjM3NzUtNWUzMi00MTgxLWI0NTctMzY4M2VlOTdjZWRiXkEyXkFqcGdeQXVyNDUzOTQ5MjY@._V1_.jpg",
-    cast: ["Elijah Wood", "Ian McKellen", "Orlando Bloom"],
-    year: 2001,
-    genres: ["Adventure", "Drama", "Fantasy"],
-    rating: 8.8,
-    trailerUrl: "https://www.youtube.com/watch?v=V75dMMIW2B4"
+    title: "Avengers: Endgame",
+    description: "After the devastating events of Avengers: Infinity War, the universe is in ruins. With the help of remaining allies, the Avengers assemble once more in order to reverse Thanos' actions and restore balance to the universe.",
+    posterUrl: "https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzQ2NzM@._V1_.jpg",
+    cast: ["Robert Downey Jr.", "Chris Evans", "Mark Ruffalo"],
+    year: 2019,
+    genres: ["Action", "Adventure", "Drama"],
+    rating: 8.4,
+    trailerUrl: "https://www.youtube.com/watch?v=TcMBFSGVi1c"
   },
   {
     id: "10",
     title: "Interstellar",
     description: "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.",
-    posterUrl: "https://m.media-amazon.com/images/M/MV5BZjdkOTU3MDktN2IxOS00OGEyLWFmMjktY2FiMmZkNWIyODZiXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg",
+    posterUrl: "https://upload.wikimedia.org/wikipedia/uk/2/29/Interstellar_film_poster2.jpg",
     cast: ["Matthew McConaughey", "Anne Hathaway", "Jessica Chastain"],
     year: 2014,
     genres: ["Adventure", "Drama", "Sci-Fi"],
@@ -119,37 +124,34 @@ const MOCK_FILMS: Film[] = [
   },
   {
     id: "11",
-    title: "The Silence of the Lambs",
-    description: "A young F.B.I. cadet must receive the help of an incarcerated and manipulative cannibal killer to help catch another serial killer.",
-    posterUrl: "https://m.media-amazon.com/images/M/MV5BNjNhZTk0ZmEtNjJhMi00YzFlLWE1MmEtYzM1M2ZmMGMwMTU4XkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg",
-    cast: ["Jodie Foster", "Anthony Hopkins", "Scott Glenn"],
-    year: 1991,
+    title: "Joker",
+    description: "In Gotham City, mentally troubled comedian Arthur Fleck is disregarded and mistreated by society. He then embarks on a downward spiral of revolution and bloody crime. This path brings him face-to-face with his alter-ego: the Joker.",
+    posterUrl: "https://m.media-amazon.com/images/M/MV5BNGVjNWI4ZGUtNzE0MS00YTJmLWE0ZDctN2ZiYTk2YmI3NTYyXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg",
+    cast: ["Joaquin Phoenix", "Robert De Niro", "Zazie Beetz"],
+    year: 2019,
     genres: ["Crime", "Drama", "Thriller"],
-    rating: 8.6,
-    trailerUrl: "https://www.youtube.com/watch?v=W6Mm8Sbe__o"
+    rating: 8.4,
+    trailerUrl: "https://www.youtube.com/watch?v=zAGVQLHvwOY"
   },
   {
     id: "12",
-    title: "Fight Club",
-    description: "An insomniac office worker and a devil-may-care soapmaker form an underground fight club that evolves into something much, much more.",
-    posterUrl: "https://m.media-amazon.com/images/M/MV5BMmEzNTkxYjQtZTc0MC00YTVjLTg5ZTEtZWMwOWVlYzY0NWIwXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg",
-    cast: ["Brad Pitt", "Edward Norton", "Meat Loaf"],
-    year: 1999,
-    genres: ["Drama"],
-    rating: 8.8,
-    trailerUrl: "https://www.youtube.com/watch?v=SUXWAEX2jlg"
+    title: "The Revenant",
+    description: "A frontiersman on a fur trading expedition in the 1820s fights for survival after being mauled by a bear and left for dead by members of his own hunting team.",
+    posterUrl: "https://m.media-amazon.com/images/M/MV5BMDE5OWMzM2QtOTU2ZS00NzAyLWI2MDEtOTRlYjIxZGM0OWRjXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_.jpg",
+    cast: ["Leonardo DiCaprio", "Tom Hardy", "Will Poulter"],
+    year: 2015,
+    genres: ["Action", "Adventure", "Drama"],
+    rating: 8.0,
+    trailerUrl: "https://www.youtube.com/watch?v=LoebZZ8K5N0"
   }
 ];
+
 //SESSIONS
-const MOCK_SESSIONS: Session[] = [
+/*export*/ const MOCK_SESSIONS: Session[] = [
   { id: "1", filmId: "1", date: "2025-04-20", time: "19:00", price: 120, hall: "IMAX" },
   { id: "2", filmId: "1", date: "2025-04-20", time: "21:30", price: 120, hall: "Hall 2" },
   { id: "3", filmId: "1", date: "2025-04-20", time: "21:30", price: 130, hall: "Hall 2" }
 ];
-
-
-
-
 
 
 const HALLS = ["IMAX", "Hall 1", "Hall 2", "Hall 3", "Hall 4"];
@@ -158,7 +160,7 @@ const GENRE_OPTIONS = ["Action", "Adventure", "Animation", "Comedy", "Crime", "D
   "Drama", "Family", "Fantasy", "Horror", "Mystery", "Romance", 
   "Sci-Fi", "Thriller", "War", "Magic"].map(genre => ({ value: genre, label: genre }));
 const AdminPanel: React.FC = () => {
-  const [films, setFilms] = useState<Film[]>(MOCK_FILMS);
+  const { films, setFilms } = useFilms();
   const [sessions, setSessions] = useState<Session[]>(MOCK_SESSIONS);
   const [isFilmDialogOpen, setIsFilmDialogOpen] = useState(false);
   const [isSessionDialogOpen, setIsSessionDialogOpen] = useState(false);
@@ -170,7 +172,7 @@ const AdminPanel: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filmForm, setFilmForm] = useState<Partial<Film>>({
     title: "", description: "", cast: [], year: new Date().getFullYear(),
-    genres: [], rating: 0, trailerUrl: ""
+    genres: [], rating: 0, trailerUrl: "", isNew: false
   });
   
   const [sessionForm, setSessionForm] = useState<Partial<Session>>({
@@ -182,7 +184,7 @@ const AdminPanel: React.FC = () => {
       setEditingFilm(null);
       setFilmForm({
         title: "", description: "", cast: [], year: new Date().getFullYear(),
-        genres: [], rating: 0, trailerUrl: ""
+        genres: [], rating: 0, trailerUrl: "", isNew: false
       });
       setPosterFile(null);
       setPosterPreview("");
@@ -215,7 +217,8 @@ const AdminPanel: React.FC = () => {
       setFilmForm({
         title: editingFilm.title, description: editingFilm.description,
         cast: editingFilm.cast, year: editingFilm.year, genres: editingFilm.genres,
-        rating: editingFilm.rating, trailerUrl: editingFilm.trailerUrl || ""
+        rating: editingFilm.rating, trailerUrl: editingFilm.trailerUrl || "",
+        isNew: editingFilm.isNew || false
       });
       setPosterPreview(editingFilm.posterUrl);
     }
@@ -279,7 +282,8 @@ const AdminPanel: React.FC = () => {
       year: typeof filmForm.year === 'number' ? filmForm.year : Number(filmForm.year) || new Date().getFullYear(),
       genres: Array.isArray(filmForm.genres) ? filmForm.genres : [],
       rating: typeof filmForm.rating === 'number' ? filmForm.rating : Number(filmForm.rating) || 0,
-      trailerUrl: filmForm.trailerUrl || ""
+      trailerUrl: filmForm.trailerUrl || "",
+      isNew: filmForm.isNew || false
     };
     
     setFilms(prev => editingFilm 
@@ -352,10 +356,13 @@ const AdminPanel: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {films.map(film => (
+            {sortFilms(films).map(film => (
               <tr key={film.id}>
                 <td><img src={film.posterUrl} alt={film.title} className="poster-thumbnail" /></td>
-                <td className="title-cell">{film.title}</td>
+                <td className="title-cell">
+                  {film.title}
+                  {film.isNew && <span className="new-badge">NEW</span>}
+                </td>
                 <td>{film.year}</td>
                 <td>{film.rating}</td>
                 <td className="genres-cell">{film.genres.join(', ')}</td>
@@ -459,6 +466,18 @@ const AdminPanel: React.FC = () => {
               <input name="rating" type="number" value={filmForm.rating || ''} 
                 onChange={handleFilmFormChange} min={0} max={10} step={0.1} className="form-input" />
             </div>
+          </div>
+          
+          <div className="form-group">
+            <label className="checkbox-item">
+              <input
+                type="checkbox"
+                checked={filmForm.isNew || false}
+                onChange={(e) => setFilmForm(prev => ({ ...prev, isNew: e.target.checked }))}
+                className="checkbox-input"
+              />
+              <span>Mark as New Release</span>
+            </label>
           </div>
           
           <div className="form-group">

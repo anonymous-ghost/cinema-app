@@ -8,6 +8,7 @@ export interface Film {
   genres: string[];
   rating: number;
   trailerUrl?: string;
+  isNew?: boolean;
 }
 
 export interface Session {
