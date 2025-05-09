@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const Footer = () => {
   return (
     <>
@@ -15,9 +17,9 @@ const Footer = () => {
             </div>
           </div>
           <div className="footer-info-right">
-            <a className="footer-pages" href="#">
+            <Link className="footer-pages" to="/faq">
               FAQ
-            </a>
+            </Link>
             <div className="contact-wrapper">
               <a className="contact-link" href="#">
                 Contact
@@ -32,12 +34,12 @@ const Footer = () => {
                 Email: contact@netflixmoviesllc.com
               </div>
             </div>
-            <a className="footer-pages" href="#">
+            <Link className="footer-pages" to="/privacy">
               Privacy
-            </a>
-            <a className="footer-pages" href="#">
+            </Link>
+            <Link className="footer-pages" to="/terms">
               Terms
-            </a>
+            </Link>
           </div>
         </div>
         <div className="footer-bottom">
