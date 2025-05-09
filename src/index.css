@@ -78,22 +78,6 @@
   }
 }
 
-/* @keyframes bubble {
-  15% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
-    border-color: #cc8ef5;
-    border-width: 2.25rem;
-  }
-  30%,
-  100% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
-    border-color: #cc8ef5;
-    border-width: 0;
-  }
-} */
-
 @keyframes sparkles {
   0%,
   20% {
@@ -109,6 +93,20 @@
 
 body {
   font-family: "Roboto", sans-serif;
+  min-height: 100vh;
+  position: relative;
+}
+
+main {
+  flex: 1;
+}
+
+footer {
+  position: relative;
+  width: 100%;
+  background-color: rgb(23, 23, 23);
+  z-index: 100;
+  bottom: 0;
 }
 
 header {
@@ -149,6 +147,7 @@ header {
   font-size: 15px;
   justify-content: center;
 }
+
 .bi {
   padding-right: 3px;
 }
@@ -341,7 +340,7 @@ header {
   transition: opacity 0.3s ease, transform 0.3s ease;
   user-select: text;
   white-space: pre-line;
-  pointer-events: none; /* пока мышка не наведена */
+  pointer-events: none;
   width: 230px;
   z-index: 100;
 }
@@ -350,7 +349,7 @@ header {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
-  pointer-events: auto; /* чтобы можно было кликать, копировать текст */
+  pointer-events: auto;
 }
 
 .footer-bottom {
@@ -380,7 +379,7 @@ header {
 .contact-link::after {
   content: "";
   position: absolute;
-  bottom: 0; /* полоска снизу */
+  bottom: 0;
   left: 0;
   height: 2px;
   width: 0;
@@ -397,7 +396,6 @@ header {
   width: 100%;
 }
 
-/* Для красивого ухода справа налево */
 .pages-link:not(:hover)::after,
 .footer-pages:not(:hover)::after,
 .contact-link:not(:hover)::after,
@@ -407,3 +405,4 @@ header {
   width: 0;
   transition: all 0.4s ease;
 }
+

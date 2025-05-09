@@ -8,9 +8,9 @@ const Header = () => {
           <Link to="/" className="pages-link">
             Home
           </Link>
-          <a href="#" className="pages-link">
+          <Link to="/sessions" className="pages-link">
             Sessions
-          </a>
+          </Link>
           <a href="#" className="pages-link">
             Favorites
           </a>
@@ -52,3 +52,4 @@ const Header = () => {
 };
 
 export default Header;
+
