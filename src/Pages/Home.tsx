@@ -1,14 +1,16 @@
+import React from "react";
 import FilmsCard from "../components/FilmsCard";
 import { Film } from "../types";
 import { useFilms } from "../contexts/FilmsContext";
 import { sortFilms } from "../utils/filmSort";
 
-const Home = () => {
-  // Поотримуємо фільми з контексту
+const Home: React.FC = () => {
+  // Отримуємо фільми з контексту
   const { films } = useFilms();
   
-  // Сортируємо фильмu 
+  // Сортуємо фільми
   const sortedFilms = sortFilms(films);
+  
   return (
     <main>
       <div className="container">

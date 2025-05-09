@@ -1,23 +1,66 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Film } from "../types";
 
 interface FilmsCardProps {
   film?: Film;
 }
 
-const FilmsCard = ({ film }: FilmsCardProps) => {
-  const [like, setLike] = useState<boolean>(true);
+const FilmsCard: React.FC<FilmsCardProps> = ({ film }) => {
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  
+  // Перевірка чи фільм у обраних при завантаженні компонента
+  useEffect(() => {
+    if (!film) return; // Вихід, якщо фільм не передано
+    
+    const checkIsFavorite = () => {
+      try {
+        const favoriteFilms = localStorage.getItem("favoriteFilms");
+        if (favoriteFilms) {
+          const favorites: Film[] = JSON.parse(favoriteFilms);
+          const isFilmFavorite = favorites.some(favoriteFilm => favoriteFilm.id === film.id);
+          setIsFavorite(isFilmFavorite);
+        }
+      } catch (error) {
+        console.error("Error checking favorites:", error);
+      }
+    };
+    
+    checkIsFavorite();
+  }, [film?.id]);
 
-  function liked(e: React.MouseEvent<HTMLButtonElement>) {
+  // Додавання або видалення фільму з обраних
+  const toggleFavorite = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setLike(!like);
-  }
+    
+    if (!film) return; // Вихід, якщо фільм не передано
+    
+    try {
+      // Отримуємо поточний список обраних
+      const favoriteFilmsString = localStorage.getItem("favoriteFilms");
+      let favoriteFilms: Film[] = favoriteFilmsString ? JSON.parse(favoriteFilmsString) : [];
+      
+      if (isFavorite) {
+        // Видаляємо з обраних
+        favoriteFilms = favoriteFilms.filter(favoriteFilm => favoriteFilm.id !== film.id);
+      } else {
+        // Додаємо до обраних
+        favoriteFilms.push(film);
+      }
+      
+      // Зберігаємо оновлений список обраних
+      localStorage.setItem("favoriteFilms", JSON.stringify(favoriteFilms));
+      setIsFavorite(!isFavorite);
+    } catch (error) {
+      console.error("Error managing favorites:", error);
+    }
+  };
+
   return (
     <a href="#" className="films-card">
       <div className="heart-background">
         <button
-          onClick={liked}
-          className={like ? "toggle-heart" : "toggle-heart liked"}
+          onClick={toggleFavorite}
+          className={isFavorite ? "toggle-heart liked" : "toggle-heart"}
           id="toggle-heart"
           aria-label="like"
         >
@@ -26,10 +69,7 @@ const FilmsCard = ({ film }: FilmsCardProps) => {
       </div>
       {film ? (
         <>
-          <img
-            src={film.posterUrl}
-            alt={film.title}
-          />
+          <img src={film.posterUrl} alt={film.title} />
           {film.isNew && <div className="new-release-tag">NEW</div>}
         </>
       ) : (

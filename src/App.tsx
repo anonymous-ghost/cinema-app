@@ -4,19 +4,21 @@ import Footer from "./components/Layout/Footer";
 import Header from "./components/Layout/Header";
 import Home from "./Pages/Home";
 import AdminPanel from "./Pages/AdminPanel";
+import Favorites from "./Pages/Favorites";
 import { FilmsProvider } from "./contexts/FilmsContext";
 
 const App = () => {
   return (
     <FilmsProvider>
-    <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/admin" element={<AdminPanel />} />
-      </Routes>
-      <Footer />
-    </BrowserRouter>
+      <BrowserRouter>
+        <Header />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/favorites" element={<Favorites />} />
+        </Routes>
+        <Footer />
+      </BrowserRouter>
     </FilmsProvider>
   );
 };
