@@ -8,7 +8,7 @@ const FilmsCard = () => {
     setLike(!like);
   }
   return (
-    <a href="#" className="films-card">
+    <a href="/movie/1" className="films-card">
       <div className="heart-background">
         <button
           onClick={liked}

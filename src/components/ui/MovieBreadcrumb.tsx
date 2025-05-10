@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 
 export interface BreadcrumbItem {
   label: string;
@@ -16,7 +16,7 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
         <span key={index}>
           {index > 0 && <span className="section-description mx-1"> › </span>}
           {item.href ? (
-            <Link href={item.href}>
+            <Link to={item.href}>
               <a className="hover:text-white transition">{item.label}</a>
             </Link>
           ) : (
