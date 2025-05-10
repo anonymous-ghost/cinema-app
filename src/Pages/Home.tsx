@@ -10,7 +10,7 @@ const Home: React.FC = () => {
   
   // Сортуємо фільми
   const sortedFilms = sortFilms(films);
-  
+
   return (
     <main>
       <div className="container">
@@ -19,9 +19,15 @@ const Home: React.FC = () => {
           <h3 className="text-current">Current and New Releases</h3>
         </div>
         <div className="films">
-          {sortedFilms.map((film: Film) => (
-            <FilmsCard key={film.id} film={film} />
-          ))}
+          {sortedFilms.length > 0 ? (
+            sortedFilms.map((film: Film) => (
+              <FilmsCard key={film.id} film={film} />
+            ))
+          ) : (
+            [...Array(12)].map((_, index) => (
+              <FilmsCard key={index} />
+            ))
+          )}
         </div>
       </div>
     </main>

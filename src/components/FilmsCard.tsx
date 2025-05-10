@@ -56,7 +56,7 @@ const FilmsCard: React.FC<FilmsCardProps> = ({ film }) => {
   };
 
   return (
-    <a href="#" className="films-card">
+    <a href={`/movie/${film?.id || 1}`} className="films-card">
       <div className="heart-background">
         <button
           onClick={toggleFavorite}
@@ -67,31 +67,21 @@ const FilmsCard: React.FC<FilmsCardProps> = ({ film }) => {
           ❤
         </button>
       </div>
-      {film ? (
-        <>
-          <img src={film.posterUrl} alt={film.title} />
-          {film.isNew && <div className="new-release-tag">NEW</div>}
-        </>
-      ) : (
-        <img
-          src="https://new.kinogo.fm/uploads/posts/2022-03/251733_1647372642.webp"
-          alt="Default poster"
-        />
-      )}
+      <img
+        src={film ? film.posterUrl : "https://new.kinogo.fm/uploads/posts/2022-03/251733_1647372642.webp"}
+        alt={film ? film.title : "Default poster"}
+      />
+      {film?.isNew && <div className="new-release-tag">NEW</div>}
       <div className="films-info-card">
-        <span className="film-name">
-          {film ? film.title : "Avatar"}
-        </span>
+        <span className="film-name">{film?.title || "Avatar"}</span>
         <div className="movie-rating">
           <span>&#9733;</span>
-          <span>{film ? film.rating : "7.5"}</span>
+          <span>{film?.rating || "7.5"}</span>
         </div>
         <div className="film-category">
-          {film ? (
-            film.genres.slice(0, 3).map((genre, index) => (
-              <span key={index} className="name-category">{genre}</span>
-            ))
-          ) : (
+          {film?.genres?.slice(0, 3).map((genre, index) => (
+            <span key={index} className="name-category">{genre}</span>
+          )) || (
             <>
               <span className="name-category">Action</span>
               <span className="name-category">Adventure</span>
