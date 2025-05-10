@@ -60,18 +60,18 @@ const MovieSeats = ({ movieId, sessions }: MovieSeatsProps) => {
   * Checks if a session and seats are selected.
   * If so — clears selection and shows a confirmation.
   */
-  const handleAddToCart = () => {
-    if (!selectedSession) {
-      toast({ title: "Please select a session date", variant: "destructive" });
-      return;
-    }
-    if (selectedSeats.length === 0) {
-      toast({ title: "No seats selected", variant: "destructive" });
-      return;
-    }
-    toast({ title: "Added to cart", description: `${selectedSeats.length} seat(s) added.` });
-    setSelectedSeats([]);
-  };
+const handleAddToCart = () => {
+  if (!selectedSession) {
+    toast({ title: "Please select a session date", variant: "destructive" });
+    return;
+  }
+  if (selectedSeats.length === 0) {
+    toast({ title: "No seats selected", variant: "destructive" });
+    return;
+  }
+  toast({ title: "Added to cart", description: `${selectedSeats.length} seat(s) added.` });
+  setSelectedSeats([]);
+};
 
   // Main JSX layout with session and seat selection
   return (

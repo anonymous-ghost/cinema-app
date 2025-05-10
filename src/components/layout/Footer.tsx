@@ -1,33 +1,52 @@
-import React from "react";
+import { Link } from "react-router-dom";
 
-const Footer: React.FC = () => {
-  const currentYear = new Date().getFullYear();
-
+const Footer = () => {
   return (
-    <footer className="w-full bg-neutral-900 px-16 py-12 mt-36 max-md:px-5 max-md:mt-10">
-      <div className="mx-auto flex w-full max-w-[1620px] flex-wrap justify-between gap-10 max-md:flex-col max-md:items-center">
-        
-        {/* Logotype / Name */}
-        <div className="mt-5">
-          <h2 className="anton-regular text-7xl text-stone-300 max-md:text-4xl">MOVIEAPP</h2>
+    <>
+      <footer>
+        <div className="footer">
+          <div className="footer-text">
+            <h1 className="footer-movieapp">MOVIEAPP</h1>
+          </div>
+          <div className="footer-center">
+            <div className="footer-center-text">
+              <span className="center-text">
+                The best place to discover and track your favorite movies and
+                sessions.
+              </span>
+            </div>
+          </div>
+          <div className="footer-info-right">
+            <Link className="footer-pages" to="/faq">
+              FAQ
+            </Link>
+            <div className="contact-wrapper">
+              <a className="contact-link" href="#">
+                Contact
+              </a>
+              <div className="contact-popup">
+                NETFLIX MOVIES LLC
+                <br />
+                24 Kinoshna St., Kyiv, Ukraine, 02000
+                <br />
+                Phone: +380 (44) 987-65-43
+                <br />
+                Email: contact@netflixmoviesllc.com
+              </div>
+            </div>
+            <Link className="footer-pages" to="/privacy">
+              Privacy
+            </Link>
+            <Link className="footer-pages" to="/terms">
+              Terms
+            </Link>
+          </div>
         </div>
-
-        {/* Description */}
-        <div className="flex flex-col items-center text-center mt-6 max-md:mt-0 max-md:px-4">
-          <p className="text-xl font-medium text-gray-400"> The best place to discover and track your favorite movies and sessions.</p>
-          <p className="mt-8 text-lg text-zinc-500"> © {currentYear} MovieApp. All rights reserved.</p>
+        <div className="footer-bottom">
+          © 2025 MovieApp. All rights reserved.
         </div>
-
-        {/* Navigation */}
-        <nav className="flex flex-wrap justify-center items-center gap-6 my-auto text-lg font-medium text-gray-400" role="navigation" aria-label="Footer navigation">
-          <a href="/faq" className="hover:text-gray-300">FAQ</a>
-          <a href="/contact" className="hover:text-gray-300">Contact</a>
-          <a href="/privacy" className="hover:text-gray-300">Privacy</a>
-          <a href="/terms" className="hover:text-gray-300">Terms</a>
-        </nav>
-
-      </div>
-    </footer>
+      </footer>
+    </>
   );
 };
 
