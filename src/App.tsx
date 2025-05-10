@@ -9,6 +9,7 @@ import FAQ from "./pages/FAQ";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import MoviePage from "@/pages/MoviePage";
+import { Toaster } from "@/components/ui/Toaster";
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
         <Route path="/movie/:id" element={<MoviePage />} />
       </Routes>
       <Footer />
+      <Toaster />
     </Router>
   );
 };
