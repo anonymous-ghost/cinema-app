@@ -1,12 +1,14 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
-import Footer from "./components/Layout/Footer";
-import Header from "./components/Layout/Header";
-import Home from "./Pages/Home";
-import Sessions from "./Pages/Sessions";
-import FAQ from "./Pages/FAQ";
-import Privacy from "./Pages/Privacy";
-import Terms from "./Pages/Terms";
+import "./styles/MoviePage.css";
+import Footer from "./components/layout/Footer";
+import Header from "./components/layout/Header";
+import Home from "./pages/Home";
+import Sessions from "./pages/Sessions";
+import FAQ from "./pages/FAQ";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import MoviePage from "@/pages/MoviePage";
 
 const App = () => {
   return (
@@ -18,6 +20,7 @@ const App = () => {
         <Route path="/faq" element={<FAQ />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
+        <Route path="/movie/:id" element={<MoviePage />} />
       </Routes>
       <Footer />
     </Router>

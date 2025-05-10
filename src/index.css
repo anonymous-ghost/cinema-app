@@ -160,10 +160,6 @@ header {
   justify-content: center;
 }
 
-.container {
-  background-color: black;
-}
-
 .main-text {
   display: grid;
   justify-content: center;
