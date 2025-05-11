@@ -27,7 +27,7 @@ const Header = () => {
           <a className="header-search" href="#">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="12"
+              width="15"
               height="16"
               fill="currentColor"
               className="bi bi-search"
