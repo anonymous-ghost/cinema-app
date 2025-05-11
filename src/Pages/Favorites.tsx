@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Film } from "../types";
 import "../styles/Favorites.css";
 import { Link } from 'react-router-dom';
-import { sortFilms } from "../utils/filmSort";
-
-// Extending Film interface to include dateAdded
-interface FavoriteFilm extends Film {
-  dateAdded: string;
-}
+import { useFavorites, FavoriteFilm } from "../contexts/FavoritesContext";
+import { useAuth } from "../contexts/AuthContext";
 
 // Custom sort function for favorite films
 const sortFavoriteFilms = (films: FavoriteFilm[]): FavoriteFilm[] => {
@@ -22,46 +17,24 @@ const sortFavoriteFilms = (films: FavoriteFilm[]): FavoriteFilm[] => {
 };
 
 const Favorites: React.FC = () => {
-  const [favoriteFilms, setFavoriteFilms] = useState<FavoriteFilm[]>([]);
+  const { favoriteFilms, removeFromFavorites } = useFavorites();
+  const { isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
 
-  // Loading favorite films from localStorage
   useEffect(() => {
-    const loadFavorites = () => {
-      try {
-        const storedFavorites = localStorage.getItem("favoriteFilms");
-        if (storedFavorites) {
-          // Adding dateAdded if it doesn't exist
-          const favorites: FavoriteFilm[] = JSON.parse(storedFavorites).map((film: Film) => {
-            if (!('dateAdded' in film)) {
-              const today = new Date();
-              const formattedDate = `${today.getDate().toString().padStart(2, '0')}.${(today.getMonth() + 1).toString().padStart(2, '0')}.${today.getFullYear()}`;
-              return {
-                ...film,
-                dateAdded: `Added: ${formattedDate}` // Current date
-              };
-            }
-            return film;
-          });
-          setFavoriteFilms(favorites);
-        }
-      } catch (error) {
-        console.error("Error loading favorite films:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    // Short timeout to prevent flash of loading state
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 300);
     
-    loadFavorites();
+    return () => clearTimeout(timer);
   }, []);
 
-  // Remove film from favorites
-  const removeFromFavorites = (e: React.MouseEvent, filmId: string) => {
+  // Handle remove from favorites with event prevention
+  const handleRemoveFromFavorites = (e: React.MouseEvent, filmId: string) => {
     e.preventDefault();
     e.stopPropagation();
-    const updatedFavorites = favoriteFilms.filter(film => film.id !== filmId);
-    setFavoriteFilms(updatedFavorites);
-    localStorage.setItem("favoriteFilms", JSON.stringify(updatedFavorites));
+    removeFromFavorites(filmId);
   };
 
   if (isLoading) {
@@ -70,6 +43,27 @@ const Favorites: React.FC = () => {
         <div className="loading-spinner"></div>
         <p className="loading-text">Loading favorite films...</p>
       </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <main style={{ minHeight: "calc(100vh - 200px)" }}>
+        <div className="container" style={{ maxWidth: "1200px", margin: "0 auto" }}>
+          <div className="main-text" style={{ textAlign: "center", marginBottom: "30px" }}>
+            <h1 className="text-netflix">FAVORITE FILMS</h1>
+            <h3 className="text-current">Please log in to see your favorites</h3>
+          </div>
+          <div className="empty-favorites-wrapper" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "300px" }}>
+            <div className="empty-favorites" style={{ textAlign: "center" }}>
+              <div className="empty-favorites-icon" style={{ fontSize: "48px", marginBottom: "20px" }}>🔐</div>
+              <h2>Authentication Required</h2>
+              <p>Please log in to view and manage your favorite films</p>
+              <Link to="/" className="browse-movies-btn" style={{ display: "inline-block", marginTop: "20px" }}>Back to Home</Link>
+            </div>
+          </div>
+        </div>
+      </main>
     );
   }
 
@@ -100,18 +94,21 @@ const Favorites: React.FC = () => {
           }}>
             {sortFavoriteFilms(favoriteFilms).map((film) => (
               <Link to={`/movie/${film.id}`} className="films-card" key={film.id}>
-                <div className="heart-background">
-                  <button
-                    onClick={(e) => removeFromFavorites(e, film.id)}
-                    className="toggle-heart liked"
-                    id="toggle-heart"
-                    aria-label="Remove from favorites"
-                  >
-                    ❤
-                  </button>
+                <div className="poster-container">
+                  <img src={film.posterUrl} alt={film.title} />
+                  <div className="heart-background">
+                    <button
+                      onClick={(e) => handleRemoveFromFavorites(e, film.id)}
+                      className="toggle-heart liked"
+                      id="toggle-heart"
+                      aria-label="Remove from favorites"
+                    >
+                      ❤
+                    </button>
+                  </div>
+                  {film.isNew && <div className="new-release-tag">NEW</div>}
+                  <div className="date-added">{film.dateAdded}</div>
                 </div>
-                <img src={film.posterUrl} alt={film.title} />
-                <div className="date-added">{film.dateAdded}</div>
                 <div className="films-info-card">
                   <span className="film-name">{film.title}</span>
                   <div className="movie-rating">

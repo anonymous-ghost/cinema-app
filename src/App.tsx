@@ -14,6 +14,7 @@ import MoviePage from "@/Pages/MoviePage";
 import { FilmsProvider } from './contexts/FilmsContext';
 import { SessionsProvider } from './contexts/SessionsContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { FavoritesProvider } from './contexts/FavoritesContext';
 import { BookingsProvider } from './contexts/BookingsContext';
 import { Toaster } from "@/components/ui/Toaster";
 import Login from "./Pages/Login";
@@ -29,26 +30,28 @@ const App = () => {
       <FilmsProvider>
         <SessionsProvider>
           <BookingsProvider>
-            <Header />
+            <FavoritesProvider>
+              <Header />
 
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/sessions" element={<Sessions />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/movie/:id" element={<MoviePage />} />
-              <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/favorites" element={<Favorites />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/bookings" element={<Bookings />} />
-              <Route path="/checkout/:sessionId" element={<Checkout />} />
-            </Routes>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/sessions" element={<Sessions />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/movie/:id" element={<MoviePage />} />
+                <Route path="/admin" element={<AdminPanel />} />
+                <Route path="/favorites" element={<Favorites />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/bookings" element={<Bookings />} />
+                <Route path="/checkout/:sessionId" element={<Checkout />} />
+              </Routes>
 
-            <Footer />
-            <Toaster />
+              <Footer />
+              <Toaster />
+            </FavoritesProvider>
           </BookingsProvider>
         </SessionsProvider>
       </FilmsProvider>

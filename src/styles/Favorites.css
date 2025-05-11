@@ -284,38 +284,50 @@
   overflow: hidden;
 }
 
-/* Date added label - позиціонування зверху зображення */
+/* Date added label - positioned at the bottom right */
 .date-added {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background: rgba(0, 0, 0, 0.75);
-  padding: 6px 8px;
-  font-size: 12px;
-  color: #fff;
-  box-sizing: border-box;
-  z-index: 1; /* Знижений z-index щоб сердечко було зверху */
-  text-align: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  bottom: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  z-index: 5;
   font-family: 'Roboto', sans-serif;
   font-weight: 400;
 }
 
-/* Об'єднання фону сердечка з датою */
+/* Heart background */
 .heart-background {
-  background-color: rgba(0, 0, 0, 0.75); /* Той самий фон, що й для дати */
+  background-color: rgba(0, 0, 0, 0.7);
   border-radius: 20px;
   padding-left: 2px;
   position: absolute;
   width: 23px;
   height: 32px;
-  right: 0px;
-  top: 0px; /* Розміщення у верхньому куті */
+  right: 10px;
+  top: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2; /* Вище ніж дата */
+  z-index: 10;
+}
+
+/* NEW tag styling for favorites page */
+.new-release-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #e50914;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Heart button styles for favorites */
