@@ -465,7 +465,7 @@ header {
 
 .user-dropdown-btn {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 5px;
   background: none;
   border: none;
