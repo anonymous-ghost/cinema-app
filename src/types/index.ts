@@ -9,6 +9,8 @@ export interface Film {
   rating: number;
   trailerUrl?: string;
   isNew?: boolean;
+  ageRating?: string;
+  runtime?: string;
 }
 
 export interface Session {

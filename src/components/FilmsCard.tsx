@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { Film } from "../types";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { useToast } from "../hooks/useToast";
 
 interface FilmsCardProps {
   film?: Film;
@@ -7,6 +10,9 @@ interface FilmsCardProps {
 
 const FilmsCard: React.FC<FilmsCardProps> = ({ film }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
   
   // Перевірка чи фільм у обраних при завантаженні компонента
   useEffect(() => {
@@ -34,6 +40,19 @@ const FilmsCard: React.FC<FilmsCardProps> = ({ film }) => {
     
     if (!film) return; // Вихід, якщо фільм не передано
     
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      toast({ 
+        title: "Authentication required", 
+        description: "Please login to add movies to favorites", 
+        variant: "destructive" 
+      });
+      
+      // Optionally navigate to login page
+      // navigate('/login');
+      return;
+    }
+    
     try {
       // Отримуємо поточний список обраних
       const favoriteFilmsString = localStorage.getItem("favoriteFilms");
@@ -50,13 +69,30 @@ const FilmsCard: React.FC<FilmsCardProps> = ({ film }) => {
       // Зберігаємо оновлений список обраних
       localStorage.setItem("favoriteFilms", JSON.stringify(favoriteFilms));
       setIsFavorite(!isFavorite);
+      
+      // Show success message
+      if (!isFavorite) {
+        toast({ 
+          title: "Added to favorites", 
+          description: `${film.title} has been added to your favorites`
+        });
+      } else {
+        toast({ 
+          title: "Removed from favorites", 
+          description: `${film.title} has been removed from your favorites`
+        });
+      }
     } catch (error) {
       console.error("Error managing favorites:", error);
     }
   };
 
+  if (!film) {
+    return null; // Don't render anything if no film is provided
+  }
+
   return (
-    <a href="/movie/1" className="films-card">
+    <Link to={`/movie/${film.id}`} className="films-card">
       <div className="heart-background">
         <button
           onClick={toggleFavorite}
@@ -67,40 +103,21 @@ const FilmsCard: React.FC<FilmsCardProps> = ({ film }) => {
           ❤
         </button>
       </div>
-      {film ? (
-        <>
-          <img src={film.posterUrl} alt={film.title} />
-          {film.isNew && <div className="new-release-tag">NEW</div>}
-        </>
-      ) : (
-        <img
-          src="https://new.kinogo.fm/uploads/posts/2022-03/251733_1647372642.webp"
-          alt="Default poster"
-        />
-      )}
+      <img src={film.posterUrl} alt={film.title} />
+      {film.isNew && <div className="new-release-tag">NEW</div>}
       <div className="films-info-card">
-        <span className="film-name">
-          {film ? film.title : "Avatar"}
-        </span>
+        <span className="film-name">{film.title}</span>
         <div className="movie-rating">
           <span>&#9733;</span>
-          <span>{film ? film.rating : "7.5"}</span>
+          <span>{film.rating}</span>
         </div>
         <div className="film-category">
-          {film ? (
-            film.genres.slice(0, 3).map((genre, index) => (
-              <span key={index} className="name-category">{genre}</span>
-            ))
-          ) : (
-            <>
-              <span className="name-category">Action</span>
-              <span className="name-category">Adventure</span>
-              <span className="name-category">Science Fiction</span>
-            </>
-          )}
+          {film.genres.slice(0, 3).map((genre, index) => (
+            <span key={index} className="name-category">{genre}</span>
+          ))}
         </div>
       </div>
-    </a>
+    </Link>
   );
 };
 

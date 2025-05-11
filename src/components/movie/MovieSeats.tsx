@@ -3,6 +3,8 @@ import { Session, Seat } from "@/types/movie";
 import { useToast } from "@/hooks/useToast";
 import SeatGrid from "./MovieSeats/SeatGrid";
 import SessionPicker from "./MovieSeats/SessionPicker";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Props expected by the component
 interface MovieSeatsProps {
@@ -24,6 +26,12 @@ const MovieSeats = ({ movieId, sessions }: MovieSeatsProps) => {
 
   // Toast for user notifications
   const { toast } = useToast();
+  
+  // Navigation hook for redirecting to checkout
+  const navigate = useNavigate();
+  
+  // Auth context to check if user is logged in
+  const { isAuthenticated } = useAuth();
 
   // Generate a map of all available seats in the hall (5 rows × 8 seats)
   const seatMap: Record<number, ExtendedSeat> = {};
@@ -56,22 +64,39 @@ const MovieSeats = ({ movieId, sessions }: MovieSeatsProps) => {
   };
 
   /*
-  * Handle adding selected seats to the cart.
+  * Handle booking process.
   * Checks if a session and seats are selected.
-  * If so — clears selection and shows a confirmation.
+  * If so — redirects to checkout page.
   */
-const handleAddToCart = () => {
-  if (!selectedSession) {
-    toast({ title: "Please select a session date", variant: "destructive" });
-    return;
-  }
-  if (selectedSeats.length === 0) {
-    toast({ title: "No seats selected", variant: "destructive" });
-    return;
-  }
-  toast({ title: "Added to cart", description: `${selectedSeats.length} seat(s) added.` });
-  setSelectedSeats([]);
-};
+  const handleBooking = () => {
+    if (!selectedSession) {
+      toast({ title: "Please select a session date", variant: "destructive" });
+      return;
+    }
+    if (selectedSeats.length === 0) {
+      toast({ title: "No seats selected", variant: "destructive" });
+      return;
+    }
+    
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      toast({ 
+        title: "Authentication required", 
+        description: "Please login to continue booking", 
+        variant: "destructive" 
+      });
+      navigate('/login');
+      return;
+    }
+    
+    // Convert ExtendedSeat to Seat for navigation state
+    const seats = selectedSeats.map(({ row, seat }) => ({ row, seat }));
+    
+    // Navigate to checkout with selected session and seats
+    navigate(`/checkout/${selectedSession.id}`, {
+      state: { selectedSeats: seats }
+    });
+  };
 
   // Main JSX layout with session and seat selection
   return (
@@ -88,10 +113,10 @@ const handleAddToCart = () => {
         />
         <div className="mt-8">
           <button
-            className="w-full bg-[#2B2625] hover:bg-[#1E1E1E] text-white py-3 rounded-[5px] font-medium transition"
-            onClick={handleAddToCart}
+            className="w-full bg-[#E50914] hover:bg-[#F40612] text-white py-3 rounded-[5px] font-medium transition"
+            onClick={handleBooking}
           >
-            Add to cart
+            Book Tickets
           </button>
         </div>
       </div>

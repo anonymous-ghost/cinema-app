@@ -4,9 +4,21 @@ import { Dialog } from "../components/ui/dialog";
 import "../styles/AdminPanel.css";
 import "../styles/FormStyles.css";
 import "../styles/ActionButtons.css";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useFilms } from "../contexts/FilmsContext";
+import { useSessions } from "../contexts/SessionsContext";
+import { useAuth } from "../contexts/AuthContext";
 import { sortFilms } from "../utils/filmSort";
+
+// Повний список жанрів
+const ALL_GENRES = [
+  "Action", "Adventure", "Animation", "Biography", "Comedy", "Crime", 
+  "Documentary", "Drama", "Family", "Fantasy", "History", "Horror", 
+  "Magic", "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western"
+];
+
+// Список вікових обмежень
+const AGE_RATINGS = ["G", "PG", "12+", "13+", "16+", "18+", "R"];
 
 export const MOCK_FILMS: Film[] = [
   {
@@ -19,7 +31,9 @@ export const MOCK_FILMS: Film[] = [
     genres: ["Fantasy", "Adventure", "Magic"],
     rating: 8.8,
     trailerUrl: "https://www.youtube.com/watch?v=d9MyW72ELq0",
-    isNew: true
+    isNew: true,
+    ageRating: "13+",
+    runtime: "2 hrs 30 min"
   },
   {
     id: "2",
@@ -31,7 +45,9 @@ export const MOCK_FILMS: Film[] = [
     genres: ["Fantasy", "Adventure", "Magic"],
     rating: 8.8,
     trailerUrl: "https://www.youtube.com/watch?v=mqqft2x_Aa4",
-    isNew: true
+    isNew: true,
+    ageRating: "16+",
+    runtime: "2 hrs 15 min"
   },
   {
     id: "3",
@@ -43,7 +59,9 @@ export const MOCK_FILMS: Film[] = [
     genres: ["Sci-Fi", "Action", "Adventure"],
     rating: 8.5,
     trailerUrl: "https://www.youtube.com/watch?v=Way9Dexny3w",
-    isNew: true
+    isNew: true,
+    ageRating: "12+",
+    runtime: "2 hrs 46 min"
   },
   {
     id: "4",
@@ -54,7 +72,9 @@ export const MOCK_FILMS: Film[] = [
     year: 2023,
     genres: ["Biography", "Drama", "History"],
     rating: 8.9,
-    trailerUrl: "https://www.youtube.com/watch?v=uYPbbksJxIg"
+    trailerUrl: "https://www.youtube.com/watch?v=uYPbbksJxIg",
+    ageRating: "16+",
+    runtime: "3 hrs"
   },
   {
     id: "5",
@@ -65,7 +85,9 @@ export const MOCK_FILMS: Film[] = [
     year: 2022,
     genres: ["Drama", "Romance"],
     rating: 7.9,
-    trailerUrl: "https://www.youtube.com/watch?v=3stfdUnMGP0"
+    trailerUrl: "https://www.youtube.com/watch?v=3stfdUnMGP0",
+    ageRating: "13+",
+    runtime: "1 hr 55 min"
   },
   {
     id: "6",
@@ -76,7 +98,9 @@ export const MOCK_FILMS: Film[] = [
     year: 2022,
     genres: ["Action", "Crime", "Drama"],
     rating: 8.3,
-    trailerUrl: "https://www.youtube.com/watch?v=mqqft2x_Aa4"
+    trailerUrl: "https://www.youtube.com/watch?v=mqqft2x_Aa4",
+    ageRating: "16+",
+    runtime: "2 hrs 56 min"
   },
   {
     id: "7",
@@ -87,7 +111,9 @@ export const MOCK_FILMS: Film[] = [
     year: 2021,
     genres: ["Action", "Adventure", "Fantasy"],
     rating: 8.2,
-    trailerUrl: "https://www.youtube.com/watch?v=JfVOs4VSpmA"
+    trailerUrl: "https://www.youtube.com/watch?v=JfVOs4VSpmA",
+    ageRating: "12+",
+    runtime: "2 hrs 28 min"
   },
   {
     id: "8",
@@ -98,7 +124,9 @@ export const MOCK_FILMS: Film[] = [
     year: 2019,
     genres: ["Drama", "Thriller"],
     rating: 8.5,
-    trailerUrl: "https://www.youtube.com/watch?v=5xH0HfJHsaY"
+    trailerUrl: "https://www.youtube.com/watch?v=5xH0HfJHsaY",
+    ageRating: "18+",
+    runtime: "2 hrs 12 min"
   },
   {
     id: "9",
@@ -109,7 +137,9 @@ export const MOCK_FILMS: Film[] = [
     year: 2019,
     genres: ["Action", "Adventure", "Drama"],
     rating: 8.4,
-    trailerUrl: "https://www.youtube.com/watch?v=TcMBFSGVi1c"
+    trailerUrl: "https://www.youtube.com/watch?v=TcMBFSGVi1c",
+    ageRating: "13+",
+    runtime: "3 hrs 1 min"
   },
   {
     id: "10",
@@ -120,7 +150,9 @@ export const MOCK_FILMS: Film[] = [
     year: 2014,
     genres: ["Adventure", "Drama", "Sci-Fi"],
     rating: 8.6,
-    trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E"
+    trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
+    ageRating: "12+",
+    runtime: "2 hrs 49 min"
   },
   {
     id: "11",
@@ -131,7 +163,9 @@ export const MOCK_FILMS: Film[] = [
     year: 2019,
     genres: ["Crime", "Drama", "Thriller"],
     rating: 8.4,
-    trailerUrl: "https://www.youtube.com/watch?v=zAGVQLHvwOY"
+    trailerUrl: "https://www.youtube.com/watch?v=zAGVQLHvwOY",
+    ageRating: "18+",
+    runtime: "2 hrs 2 min"
   },
   {
     id: "12",
@@ -142,7 +176,9 @@ export const MOCK_FILMS: Film[] = [
     year: 2015,
     genres: ["Action", "Adventure", "Drama"],
     rating: 8.0,
-    trailerUrl: "https://www.youtube.com/watch?v=LoebZZ8K5N0"
+    trailerUrl: "https://www.youtube.com/watch?v=LoebZZ8K5N0",
+    ageRating: "16+",
+    runtime: "2 hrs 36 min"
   }
 ];
 
@@ -156,12 +192,14 @@ export const MOCK_FILMS: Film[] = [
 
 const HALLS = ["IMAX", "Hall 1", "Hall 2", "Hall 3", "Hall 4"];
 const DEFAULT_PRICES = { "IMAX": 250, "Hall 1": 200, "Hall 2": 180, "Hall 3": 180, "Hall 4": 160 };
-const GENRE_OPTIONS = ["Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", 
-  "Drama", "Family", "Fantasy", "Horror", "Mystery", "Romance", 
-  "Sci-Fi", "Thriller", "War", "Magic"].map(genre => ({ value: genre, label: genre }));
+const GENRE_OPTIONS = ALL_GENRES.map(genre => ({ value: genre, label: genre }));
+
 const AdminPanel: React.FC = () => {
   const { films, setFilms } = useFilms();
-  const [sessions, setSessions] = useState<Session[]>(MOCK_SESSIONS);
+  const { sessions, setSessions } = useSessions();
+  const { isAdmin, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  
   const [isFilmDialogOpen, setIsFilmDialogOpen] = useState(false);
   const [isSessionDialogOpen, setIsSessionDialogOpen] = useState(false);
   const [editingFilm, setEditingFilm] = useState<Film | null>(null);
@@ -172,19 +210,34 @@ const AdminPanel: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filmForm, setFilmForm] = useState<Partial<Film>>({
     title: "", description: "", cast: [], year: new Date().getFullYear(),
-    genres: [], rating: 0, trailerUrl: "", isNew: false
+    genres: [], rating: 0, trailerUrl: "", isNew: false, ageRating: "13+",
+    runtime: "2 hrs"
   });
   
   const [sessionForm, setSessionForm] = useState<Partial<Session>>({
     filmId: "", date: new Date().toISOString().split('T')[0],
     time: "19:00", price: 200, hall: ""
   });
+  
+  // Check if user is admin, if not redirect to home page
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    
+    if (!isAdmin) {
+      navigate('/');
+    }
+  }, [isAdmin, isAuthenticated, navigate]);
+  
   useEffect(() => {
     if (!isFilmDialogOpen) {
       setEditingFilm(null);
       setFilmForm({
         title: "", description: "", cast: [], year: new Date().getFullYear(),
-        genres: [], rating: 0, trailerUrl: "", isNew: false
+        genres: [], rating: 0, trailerUrl: "", isNew: false, ageRating: "13+",
+        runtime: "2 hrs"
       });
       setPosterFile(null);
       setPosterPreview("");
@@ -218,7 +271,8 @@ const AdminPanel: React.FC = () => {
         title: editingFilm.title, description: editingFilm.description,
         cast: editingFilm.cast, year: editingFilm.year, genres: editingFilm.genres,
         rating: editingFilm.rating, trailerUrl: editingFilm.trailerUrl || "",
-        isNew: editingFilm.isNew || false
+        isNew: editingFilm.isNew || false, ageRating: editingFilm.ageRating || "13+",
+        runtime: editingFilm.runtime || "2 hrs"
       });
       setPosterPreview(editingFilm.posterUrl);
     }
@@ -283,7 +337,9 @@ const AdminPanel: React.FC = () => {
       genres: Array.isArray(filmForm.genres) ? filmForm.genres : [],
       rating: typeof filmForm.rating === 'number' ? filmForm.rating : Number(filmForm.rating) || 0,
       trailerUrl: filmForm.trailerUrl || "",
-      isNew: filmForm.isNew || false
+      isNew: filmForm.isNew || false,
+      ageRating: filmForm.ageRating || "13+",
+      runtime: filmForm.runtime || "2 hrs"
     };
     
     setFilms(prev => editingFilm 
@@ -335,232 +391,278 @@ const AdminPanel: React.FC = () => {
 
   return (
     <div className="admin-panel">
-      {/* Movies Section */}
-      <div className="admin-section">
-        <div className="section-header">
-          <div className="section-title-area">
-            <h2 className="netflix-title">NETFLIX MOVIES</h2>
-            <p className="section-subtitle">Manage your movie catalog</p>
-          </div>
-          <button className="netflix-button" onClick={() => setIsFilmDialogOpen(true)}>Add Movie</button>
+      {/* Access denied message for non-admin users */}
+      {!isAdmin && (
+        <div className="access-denied">
+          <h2>Access Denied</h2>
+          <p>You do not have permission to access the admin panel.</p>
+          <button onClick={() => navigate('/')} className="back-home-btn">
+            Back to Home
+          </button>
         </div>
-        <table className="netflix-table">
-          <thead>
-            <tr>
-              <th className="poster-column">Poster</th>
-              <th className="title-column">Title</th>
-              <th className="year-column">Year</th>
-              <th className="rating-column">Rating</th>
-              <th className="genres-column">Genres</th>
-              <th className="actions-column">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortFilms(films).map(film => (
-              <tr key={film.id}>
-                <td><img src={film.posterUrl} alt={film.title} className="poster-thumbnail" /></td>
-                <td className="title-cell">
-                  {film.title}
-                  {film.isNew && <span className="new-badge">NEW</span>}
-                </td>
-                <td>{film.year}</td>
-                <td>{film.rating}</td>
-                <td className="genres-cell">{film.genres.join(', ')}</td>
-                <td>
-                  <div className="netflix-actions">
-                    <button className="netflix-edit-btn" onClick={() => { setEditingFilm(film); setIsFilmDialogOpen(true); }}>Edit</button>
-                    <button className="netflix-delete-btn" onClick={() => handleDeleteFilm(film.id)}>Delete</button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {/* Sessions Section */}
-      <div className="admin-section">
-        <div className="section-header">
-          <div className="section-title-area">
-            <h2 className="netflix-title">SESSIONS</h2>
-            <p className="section-subtitle">Manage movie sessions and schedules</p>
-          </div>
-          <button className="netflix-button" onClick={() => setIsSessionDialogOpen(true)} disabled={films.length === 0}>Add Session</button>
-        </div>
-
-        <table className="netflix-table">
-          <thead>
-            <tr>
-              <th>Movie</th>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Price</th>
-              <th>Hall</th>
-              <th className="actions-column">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sessions.map(session => {
-              const film = films.find(f => f.id === session.filmId);
-              return (
-                <tr key={session.id}>
-                  <td>{film?.title || 'Unknown Film'}</td>
-                  <td>{session.date}</td>
-                  <td>{session.time}</td>
-                  <td>{session.price} UAH</td>
-                  <td>{session.hall}</td>
-                  <td>
-                    <div className="netflix-actions">
-                      <button className="netflix-edit-btn" onClick={() => { setEditingSession(session); setIsSessionDialogOpen(true); }}>Edit</button>
-                      <button className="netflix-delete-btn" onClick={() => handleDeleteSession(session.id)}>Delete</button>
-                    </div>
-                  </td>
+      )}
+      
+      {/* Only render admin panel content if user is admin */}
+      {isAdmin && (
+        <>
+          {/* Movies Section */}
+          <div className="admin-section">
+            <div className="section-header">
+              <div className="section-title-area">
+                <h2 className="netflix-title">NETFLIX MOVIES</h2>
+                <p className="section-subtitle">Manage your movie catalog</p>
+              </div>
+              <button className="netflix-button" onClick={() => setIsFilmDialogOpen(true)}>Add Movie</button>
+            </div>
+            <table className="netflix-table">
+              <thead>
+                <tr>
+                  <th className="poster-column">Poster</th>
+                  <th className="title-column">Title</th>
+                  <th className="year-column">Year</th>
+                  <th className="rating-column">Rating</th>
+                  <th className="age-rating-column">Age Rating</th>
+                  <th className="genres-column">Genres</th>
+                  <th className="actions-column">Actions</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      {/* Film Dialog */}
-      <Dialog open={isFilmDialogOpen} onOpenChange={setIsFilmDialogOpen} title={editingFilm ? "Edit Movie" : "Add Movie"}>
-        <form onSubmit={handleSaveFilm} className="space-y-4">
-          <div className="form-group">
-            <label className="form-label">Title</label>
-            <input name="title" value={filmForm.title || ''} onChange={handleFilmFormChange} className="form-input" required />
+              </thead>
+              <tbody>
+                {sortFilms(films).map(film => (
+                  <tr key={film.id}>
+                    <td><img src={film.posterUrl} alt={film.title} className="poster-thumbnail" /></td>
+                    <td className="title-cell">
+                      {film.title}
+                      {film.isNew && <span className="new-badge">NEW</span>}
+                    </td>
+                    <td>{film.year}</td>
+                    <td>{film.rating}</td>
+                    <td>{film.ageRating || "13+"}</td>
+                    <td className="genres-cell">{film.genres.join(', ')}</td>
+                    <td>
+                      <div className="netflix-actions">
+                        <button className="netflix-edit-btn" onClick={() => { setEditingFilm(film); setIsFilmDialogOpen(true); }}>Edit</button>
+                        <button className="netflix-delete-btn" onClick={() => handleDeleteFilm(film.id)}>Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          
-          <div className="form-group">
-            <label className="form-label">Description</label>
-            <textarea name="description" value={filmForm.description || ''} onChange={handleFilmFormChange} rows={3} className="form-textarea" required />
+          {/* Sessions Section */}
+          <div className="admin-section">
+            <div className="section-header">
+              <div className="section-title-area">
+                <h2 className="netflix-title">SESSIONS</h2>
+                <p className="section-subtitle">Manage movie sessions and schedules</p>
+              </div>
+              <button className="netflix-button" onClick={() => setIsSessionDialogOpen(true)} disabled={films.length === 0}>Add Session</button>
+            </div>
+
+            <table className="netflix-table">
+              <thead>
+                <tr>
+                  <th>Movie</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Price</th>
+                  <th>Hall</th>
+                  <th className="actions-column">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sessions.map(session => {
+                  const film = films.find(f => f.id === session.filmId);
+                  return (
+                    <tr key={session.id}>
+                      <td>{film?.title || 'Unknown Film'}</td>
+                      <td>{session.date}</td>
+                      <td>{session.time}</td>
+                      <td>{session.price} UAH</td>
+                      <td>{session.hall}</td>
+                      <td>
+                        <div className="netflix-actions">
+                          <button className="netflix-edit-btn" onClick={() => { setEditingSession(session); setIsSessionDialogOpen(true); }}>Edit</button>
+                          <button className="netflix-delete-btn" onClick={() => handleDeleteSession(session.id)}>Delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
-          
-          <div className="form-group">
-            <label className="form-label">Genres</label>
-            <div className="checkbox-grid scrollable-checkboxes">
-              {GENRE_OPTIONS.map(genre => (
-                <label key={genre.value} className="checkbox-item">
-                  <input type="checkbox" value={genre.value} 
-                    checked={filmForm.genres?.includes(genre.value)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setFilmForm(prev => ({ ...prev, genres: [...(prev.genres || []), genre.value] }));
-                      } else {
-                        setFilmForm(prev => ({ ...prev, genres: (prev.genres || []).filter(g => g !== genre.value) }));
-                      }
-                    }}
-                    className="checkbox-input" />
-                  <span>{genre.label}</span>
+          {/* Film Dialog */}
+          <Dialog open={isFilmDialogOpen} onOpenChange={setIsFilmDialogOpen} title={editingFilm ? "Edit Movie" : "Add Movie"}>
+            <form onSubmit={handleSaveFilm} className="space-y-4">
+              <div className="form-group">
+                <label className="form-label">Title</label>
+                <input name="title" value={filmForm.title || ''} onChange={handleFilmFormChange} className="form-input" required />
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Description</label>
+                <textarea name="description" value={filmForm.description || ''} onChange={handleFilmFormChange} rows={3} className="form-textarea" required />
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Genres</label>
+                <div className="scrollable-checkboxes">
+                  {GENRE_OPTIONS.map(genre => (
+                    <label key={genre.value} className="checkbox-item">
+                      <input type="checkbox" value={genre.value} 
+                        checked={filmForm.genres?.includes(genre.value)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFilmForm(prev => ({ ...prev, genres: [...(prev.genres || []), genre.value] }));
+                          } else {
+                            setFilmForm(prev => ({ ...prev, genres: (prev.genres || []).filter(g => g !== genre.value) }));
+                          }
+                        }}
+                        className="checkbox-input" />
+                      <span>{genre.label}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="selected-genres">
+                  {filmForm.genres && filmForm.genres.length > 0 ? (
+                    <p>Selected: {filmForm.genres.join(', ')}</p>
+                  ) : (
+                    <p>No genres selected</p>
+                  )}
+                </div>
+              </div>
+              
+              <div className="form-row">
+                <div className="form-group half-width">
+                  <label className="form-label">Year</label>
+                  <input name="year" type="number" value={filmForm.year || new Date().getFullYear()} 
+                    onChange={handleFilmFormChange} min={1900} max={new Date().getFullYear() + 5} className="form-input" />
+                </div>
+                
+                <div className="form-group half-width">
+                  <label className="form-label">Rating</label>
+                  <input name="rating" type="number" value={filmForm.rating || ''} 
+                    onChange={handleFilmFormChange} min={0} max={10} step={0.1} className="form-input" />
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Runtime</label>
+                <input 
+                  name="runtime" 
+                  value={filmForm.runtime || ''} 
+                  onChange={handleFilmFormChange}
+                  placeholder="e.g. 2 hrs 30 min" 
+                  className="form-input" 
+                />
+              </div>
+              
+              <div className="form-group">
+                <label className="checkbox-item">
+                  <input
+                    type="checkbox"
+                    checked={filmForm.isNew || false}
+                    onChange={(e) => setFilmForm(prev => ({ ...prev, isNew: e.target.checked }))}
+                    className="checkbox-input"
+                  />
+                  <span>Mark as New Release</span>
                 </label>
-              ))}
-            </div>
-          </div>
-          
-          <div className="form-row">
-            <div className="form-group half-width">
-              <label className="form-label">Year</label>
-              <input name="year" type="number" value={filmForm.year || new Date().getFullYear()} 
-                onChange={handleFilmFormChange} min={1900} max={new Date().getFullYear() + 5} className="form-input" />
-            </div>
-            
-            <div className="form-group half-width">
-              <label className="form-label">Rating</label>
-              <input name="rating" type="number" value={filmForm.rating || ''} 
-                onChange={handleFilmFormChange} min={0} max={10} step={0.1} className="form-input" />
-            </div>
-          </div>
-          
-          <div className="form-group">
-            <label className="checkbox-item">
-              <input
-                type="checkbox"
-                checked={filmForm.isNew || false}
-                onChange={(e) => setFilmForm(prev => ({ ...prev, isNew: e.target.checked }))}
-                className="checkbox-input"
-              />
-              <span>Mark as New Release</span>
-            </label>
-          </div>
-          
-          <div className="form-group">
-            <label className="form-label">Poster</label>
-            <div className="poster-upload">
-              <input type="file" id="poster-upload" accept="image/*" onChange={handlePosterChange} className="poster-input" />
-              <label htmlFor="poster-upload" className="poster-upload-label">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" style={{marginRight: '8px'}} viewBox="0 0 16 16">
-                  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                  <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-                </svg>
-                Choose file
-              </label>
-              <span className="file-name">{posterFile ? posterFile.name : "No file chosen"}</span>
-              {posterPreview && <div className="poster-preview"><img src={posterPreview} alt="Preview" id="preview" /></div>}
-            </div>
-          </div>
-          
-          <div className="form-group">
-            <label className="form-label">Trailer (YouTube link)</label>
-            <input name="trailerUrl" type="url" value={filmForm.trailerUrl || ''} 
-              onChange={handleFilmFormChange} placeholder="https://www.youtube.com/watch?v=..." className="form-input" />
-          </div>
-          
-          <div className="form-group">
-            <label className="form-label">Cast (comma separated)</label>
-            <input name="cast" value={formatCastForInput(filmForm.cast)} 
-              onChange={(e) => setFilmForm(prev => ({ ...prev, cast: e.target.value.split(',').map(s => s.trim()).filter(s => s) }))} 
-              className="form-input" placeholder="Actor 1, Actor 2, Actor 3" />
-          </div>
-          
-          <div className="form-actions">
-            <button type="button" className="admin-btn admin-btn-secondary" onClick={() => setIsFilmDialogOpen(false)}>Cancel</button>
-            <button type="submit" className="admin-btn admin-btn-primary">Save</button>
-          </div>
-        </form>
-      </Dialog>
-      {/* Session Dialog */}
-      <Dialog open={isSessionDialogOpen} onOpenChange={setIsSessionDialogOpen} title={editingSession ? "Edit Session" : "Add Session"}>
-        <form onSubmit={handleSaveSession} className="space-y-4">
-          <div className="form-group">
-            <label className="form-label">Movie</label>
-            <select name="filmId" value={sessionForm.filmId} onChange={handleSessionFormChange} className="form-select" required>
-              {films.map(film => (<option key={film.id} value={film.id}>{film.title}</option>))}
-            </select>
-          </div>
-          
-          <div className="form-group">
-            <label className="form-label">Date</label>
-            <div className="relative">
-              <input name="date" type="date" value={sessionForm.date} onChange={handleSessionFormChange} className="form-input pr-10" required/>
-              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">📅</span>
-            </div>
-          </div>
-          
-          <div className="form-group">
-            <label className="form-label">Time</label>
-            <div className="relative">
-              <input name="time" type="time" value={sessionForm.time} onChange={handleSessionFormChange} className="form-input pr-10" required/>
-              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">🕒</span>
-            </div>
-          </div>
-          
-          <div className="form-group">
-            <label className="form-label">Hall (optional)</label>
-            <select name="hall" value={sessionForm.hall} onChange={handleSessionFormChange} className="form-select">
-              <option value="">Select hall</option>
-              {HALLS.map(hall => (<option key={hall} value={hall}>{hall} - {prices[hall]} UAH</option>))}
-            </select>
-          </div>
-          
-          <div className="form-group">
-            <label className="form-label">Price</label>
-            <input name="price" type="number" value={sessionForm.price} onChange={handleSessionFormChange} className="form-input" min={0} required/>
-          </div>
-          
-          <div className="flex justify-end space-x-3 pt-4">
-            <button type="button" className="admin-btn admin-btn-secondary" onClick={() => setIsSessionDialogOpen(false)}>Cancel</button>
-            <button type="submit" className="admin-btn admin-btn-primary">Save</button>
-          </div>
-        </form>
-      </Dialog>
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Poster</label>
+                <div className="poster-upload">
+                  <input type="file" id="poster-upload" accept="image/*" onChange={handlePosterChange} className="poster-input" />
+                  <label htmlFor="poster-upload" className="poster-upload-label">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" style={{marginRight: '8px'}} viewBox="0 0 16 16">
+                      <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                      <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                    </svg>
+                    Choose file
+                  </label>
+                  <span className="file-name">{posterFile ? posterFile.name : "No file chosen"}</span>
+                  {posterPreview && <div className="poster-preview"><img src={posterPreview} alt="Preview" id="preview" /></div>}
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Trailer (YouTube link)</label>
+                <input name="trailerUrl" type="url" value={filmForm.trailerUrl || ''} 
+                  onChange={handleFilmFormChange} placeholder="https://www.youtube.com/watch?v=..." className="form-input" />
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Cast (comma separated)</label>
+                <input name="cast" value={formatCastForInput(filmForm.cast)} 
+                  onChange={(e) => setFilmForm(prev => ({ ...prev, cast: e.target.value.split(',').map(s => s.trim()).filter(s => s) }))} 
+                  className="form-input" placeholder="Actor 1, Actor 2, Actor 3" />
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Age Rating</label>
+                <select name="ageRating" value={filmForm.ageRating || '13+'} onChange={handleFilmFormChange} className="form-select">
+                  {AGE_RATINGS.map(rating => (
+                    <option key={rating} value={rating}>{rating}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-actions">
+                <button type="button" className="admin-btn admin-btn-secondary" onClick={() => setIsFilmDialogOpen(false)}>Cancel</button>
+                <button type="submit" className="admin-btn admin-btn-primary">Save</button>
+              </div>
+            </form>
+          </Dialog>
+          {/* Session Dialog */}
+          <Dialog open={isSessionDialogOpen} onOpenChange={setIsSessionDialogOpen} title={editingSession ? "Edit Session" : "Add Session"}>
+            <form onSubmit={handleSaveSession} className="space-y-4">
+              <div className="form-group">
+                <label className="form-label">Movie</label>
+                <select name="filmId" value={sessionForm.filmId} onChange={handleSessionFormChange} className="form-select" required>
+                  {films.map(film => (<option key={film.id} value={film.id}>{film.title}</option>))}
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Date</label>
+                <div className="relative">
+                  <input name="date" type="date" value={sessionForm.date} onChange={handleSessionFormChange} className="form-input pr-10" required/>
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">📅</span>
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Time</label>
+                <div className="relative">
+                  <input name="time" type="time" value={sessionForm.time} onChange={handleSessionFormChange} className="form-input pr-10" required/>
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">🕒</span>
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Hall (optional)</label>
+                <select name="hall" value={sessionForm.hall} onChange={handleSessionFormChange} className="form-select">
+                  <option value="">Select hall</option>
+                  {HALLS.map(hall => (<option key={hall} value={hall}>{hall} - {prices[hall]} UAH</option>))}
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Price</label>
+                <input name="price" type="number" value={sessionForm.price} onChange={handleSessionFormChange} className="form-input" min={0} required/>
+              </div>
+              
+              <div className="flex justify-end space-x-3 pt-4">
+                <button type="button" className="admin-btn admin-btn-secondary" onClick={() => setIsSessionDialogOpen(false)}>Cancel</button>
+                <button type="submit" className="admin-btn admin-btn-primary">Save</button>
+              </div>
+            </form>
+          </Dialog>
+        </>
+      )}
     </div>
   );
 };
+
 export default AdminPanel; 
