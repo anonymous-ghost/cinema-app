@@ -525,21 +525,27 @@ header {
 .auth-links {
   display: flex;
   gap: 15px;
+  align-items: center;
 }
 
 .login-link, 
 .register-link {
   text-decoration: none;
-  padding: 6px 12px;
+  padding: 7px 14px;
   border-radius: 4px;
   font-size: 14px;
+  font-weight: 500;
   transition: all 0.3s;
+  border: 1px solid #e50914;
+  min-width: 80px;
+  text-align: center;
+  display: inline-block;
+  letter-spacing: 0.3px;
 }
 
 .login-link {
   color: #fff;
   background-color: transparent;
-  border: 1px solid #e50914;
 }
 
 .login-link:hover {
@@ -548,11 +554,10 @@ header {
 
 .register-link {
   color: #fff;
-  background-color: #e50914;
-  border: 1px solid #e50914;
+  background-color: rgba(229, 9, 20, 0.15);
 }
 
 .register-link:hover {
-  background-color: #f40612;
+  background-color: rgba(229, 9, 20, 0.25);
 }
 
