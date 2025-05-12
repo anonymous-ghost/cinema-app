@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Film } from '../types';
 import { MOCK_FILMS } from '../Pages/AdminPanel';
 
@@ -13,7 +13,16 @@ const FilmsContext = createContext<FilmsContextType | undefined>(undefined);
 
 // Provider component
 export const FilmsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [films, setFilms] = useState<Film[]>(MOCK_FILMS);
+  // Initialize films from localStorage if available, otherwise use MOCK_FILMS
+  const [films, setFilms] = useState<Film[]>(() => {
+    const savedFilms = localStorage.getItem('films');
+    return savedFilms ? JSON.parse(savedFilms) : MOCK_FILMS;
+  });
+
+  // Save films to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('films', JSON.stringify(films));
+  }, [films]);
 
   return (
     <FilmsContext.Provider value={{ films, setFilms }}>

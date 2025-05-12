@@ -33,7 +33,7 @@ export interface ExtendedSeat extends Seat {
 export interface Booking {
   id: string;
   userId: string;
-  sessionId: number;
+  sessionId: string;
   seats: Seat[];
   totalPrice: number;
   bookingDate: string;

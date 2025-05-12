@@ -99,7 +99,7 @@ const Checkout = () => {
         const newBooking = {
           id: `booking_${Date.now()}`,
           userId: currentUser.id,
-          sessionId: Number(session.id),
+          sessionId: session.id,
           seats: state.selectedSeats,
           totalPrice,
           bookingDate: new Date().toISOString(),

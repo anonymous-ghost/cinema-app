@@ -121,7 +121,7 @@ const Sessions = () => {
     const newBooking = {
       id: `booking_${Date.now()}`,
       userId: currentUser.id,
-      sessionId: Number(selectedSession.id),
+      sessionId: selectedSession.id,
       seats: processedSeats,
       totalPrice,
       bookingDate: new Date().toISOString(),

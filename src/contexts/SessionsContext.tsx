@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Session } from '../types';
 
 // Оновлений список сеансів - по 2 сеанси для кожного фільму з різними датами
@@ -63,7 +63,16 @@ const SessionsContext = createContext<SessionsContextType | undefined>(undefined
 
 // Provider component
 export const SessionsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [sessions, setSessions] = useState<Session[]>(MOCK_SESSIONS);
+  // Initialize sessions from localStorage or use mock data
+  const [sessions, setSessions] = useState<Session[]>(() => {
+    const savedSessions = localStorage.getItem('sessions');
+    return savedSessions ? JSON.parse(savedSessions) : MOCK_SESSIONS;
+  });
+
+  // Save sessions to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('sessions', JSON.stringify(sessions));
+  }, [sessions]);
 
   return (
     <SessionsContext.Provider value={{ sessions, setSessions }}>

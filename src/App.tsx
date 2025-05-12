@@ -22,7 +22,8 @@ import Register from "./Pages/Register";
 import Profile from "./Pages/Profile";
 import Bookings from "./Pages/Bookings";
 import Checkout from "./Pages/Checkout";
-import { Search } from "lucide-react";
+import { Search as SearchIcon } from "lucide-react";
+import Search from "./Pages/Search";
 
 
 const App = () => {

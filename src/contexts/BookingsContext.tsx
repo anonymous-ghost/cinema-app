@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Booking, BookingStatus } from '../types/movie';
 
 // Mock bookings data
@@ -6,7 +6,7 @@ const MOCK_BOOKINGS: Booking[] = [
   {
     id: "1",
     userId: "user1",
-    sessionId: 1,
+    sessionId: "1",
     seats: [{ row: 1, seat: 5 }, { row: 1, seat: 6 }],
     totalPrice: 240,
     bookingDate: "2023-06-15T14:30:00",
@@ -16,7 +16,7 @@ const MOCK_BOOKINGS: Booking[] = [
   {
     id: "2",
     userId: "user2",
-    sessionId: 3,
+    sessionId: "3",
     seats: [{ row: 3, seat: 8 }],
     totalPrice: 120,
     bookingDate: "2023-06-16T10:15:00",
@@ -26,7 +26,7 @@ const MOCK_BOOKINGS: Booking[] = [
   {
     id: "3",
     userId: "user1",
-    sessionId: 5,
+    sessionId: "5",
     seats: [{ row: 5, seat: 10 }, { row: 5, seat: 11 }, { row: 5, seat: 12 }],
     totalPrice: 360,
     bookingDate: "2023-06-18T18:45:00",
@@ -48,7 +48,16 @@ const BookingsContext = createContext<BookingsContextType | undefined>(undefined
 
 // Provider component
 export const BookingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [bookings, setBookings] = useState<Booking[]>(MOCK_BOOKINGS);
+  // Initialize bookings from localStorage or use mock data
+  const [bookings, setBookings] = useState<Booking[]>(() => {
+    const savedBookings = localStorage.getItem('bookings');
+    return savedBookings ? JSON.parse(savedBookings) : MOCK_BOOKINGS;
+  });
+
+  // Save bookings to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('bookings', JSON.stringify(bookings));
+  }, [bookings]);
 
   const addBooking = (booking: Booking) => {
     setBookings(prevBookings => [...prevBookings, booking]);

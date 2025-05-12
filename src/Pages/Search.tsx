@@ -1,114 +1,84 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import FilmsCard from "../components/FilmsCard";
 import "../styles/Search.css";
+import { useFilms } from "../contexts/FilmsContext";
+import { Film } from "../types";
+import { sortFilms } from "../utils/filmSort";
 
 const Search = () => {
-  const [searchTitle, setSearchTitle] = useState("");
-  const [selectedGenre, setSelectedGenre] = useState("All genres");
-  const [selectedYear, setSelectedYear] = useState("Any year");
-  const [selectedRating, setSelectedRating] = useState("Any rating");
+  // Initialize state from localStorage if available
+  const [searchTitle, setSearchTitle] = useState(() => {
+    return localStorage.getItem('searchTitle') || "";
+  });
+  const [selectedGenre, setSelectedGenre] = useState(() => {
+    return localStorage.getItem('selectedGenre') || "All genres";
+  });
+  const [selectedYear, setSelectedYear] = useState(() => {
+    return localStorage.getItem('selectedYear') || "Any year";
+  });
+  const [selectedRating, setSelectedRating] = useState(() => {
+    return localStorage.getItem('selectedRating') || "Any rating";
+  });
+  const [currentPage, setCurrentPage] = useState(() => {
+    return parseInt(localStorage.getItem('currentPage') || "1");
+  });
+  const itemsPerPage = 8;
+  const searchResultsRef = useRef<HTMLDivElement>(null);
+  const [showArrows, setShowArrows] = useState(false);
 
-  // Mock data for demonstration - in a real app, this would come from an API
-  const genres = ["All genres", "Action", "Adventure", "Animation", "Biography", "Comedy", "Crime", "Documentary", "Drama", "Family", "Fantasy", "Film-Noir", "History", "Horror", "Music", "Musical", "Mystery", "Romance", "Sci-Fi", "Sport", "Thriller", "War", "Western"];
-  const years = ["Any year", "2025", "2024", "2023", "2022", "2021", "2020", "2019", "2018", "2017", "2016", "2015", "2014"];
-  const ratings = ["Any rating", "9+", "8+", "7+", "6+", "5+", "4+","3+", "2+"];
+  // Get films from context
+  const { films } = useFilms();
 
-  // Full movie dataset with different genres and ratings (12 movies total)
-  const allMovies = [
-    {
-      title: "Avatar 3",
-      rating: 8.9,
-      image: "https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjQxNTE1MDA@._V1_FMjpg_UX1000_.jpg",
-      categories: ["Sci-Fi", "Adventure", "Action"],
-      year: "2025"
-    },
-    {
-      title: "Blade",
-      rating: 8.3,
-      image: "https://upload.wikimedia.org/wikipedia/ru/8/88/Blade-poster.jpg",
-      categories: ["Action", "Horror", "Fantasy"],
-      year: "2024"
-    },
-    {
-      title: "Dune: Part Two",
-      rating: 8.8,
-      image: "https://upload.wikimedia.org/wikipedia/en/5/52/Dune_Part_Two_poster.jpeg",
-      categories: ["Sci-Fi", "Adventure", "Drama"],
-      year: "2023"
-    },
-    {
-      title: "Barbie",
-      rating: 7.0,
-      image: "https://m.media-amazon.com/images/M/MV5BNjU3N2QxNzYtMjk1NC00MTc4LTk1NTQtMmUxNTljM2I0NDA5XkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_.jpg",
-      categories: ["Adventure", "Comedy", "Fantasy"],
-      year: "2023"
-    },
-    {
-      title: "The Batman",
-      rating: 7.8,
-      image: "https://m.media-amazon.com/images/M/MV5BMDdmMTBiNTYtMDIzNi00NGVlLWIzMDYtZTk3MTQ3NGQxZGEwXkEyXkFqcGdeQXVyMzMwOTU5MDk@._V1_.jpg",
-      categories: ["Action", "Crime", "Drama"],
-      year: "2022"
-    },
-    {
-      title: "Spider-Man: No Way Home",
-      rating: 8.2,
-      image: "https://m.media-amazon.com/images/M/MV5BZWMyYzFjYTYtNTRjYi00OGExLWE2YzgtOGRmYjAxZTU3NzBiXkEyXkFqcGdeQXVyMzQ0MzA0NTM@._V1_.jpg",
-      categories: ["Action", "Adventure", "Fantasy"],
-      year: "2021"
-    },
-    {
-      title: "Soul",
-      rating: 8.0,
-      image: "https://m.media-amazon.com/images/M/MV5BZGE1MDg5M2MtNTkyZS00MTY5LTg1YzUtZTlhZmM1Y2EwNmFmXkEyXkFqcGdeQXVyNjA3OTI0MDc@._V1_.jpg",
-      categories: ["Animation", "Adventure", "Comedy"],
-      year: "2020"
-    },
-    {
-      title: "Joker",
-      rating: 8.4,
-      image: "https://m.media-amazon.com/images/M/MV5BNGVjNWI4ZGUtNzE0MS00YTJmLWE0ZDctN2ZiYTk2YmI3NTYyXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg",
-      categories: ["Crime", "Drama", "Thriller"],
-      year: "2019"
-    },
-    {
-      title: "Interstellar",
-      rating: 8.7,
-      image: "https://m.media-amazon.com/images/M/MV5BZjdkOTU3MDktN2IxOS00OGEyLWFmMjktY2FiMmZkNWIyODZiXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg",
-      categories: ["Sci-Fi", "Adventure", "Drama"],
-      year: "2014"
-    },
-
-
-    {
-      title: "Parasite",
-      rating: 8.6,
-      image: "https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_.jpg",
-      categories: ["Comedy", "Drama", "Thriller"],
-      year: "2019"
-    },
-    {
-      title: "Joker",
-      rating: 8.4,
-      image: "https://m.media-amazon.com/images/M/MV5BNGVjNWI4ZGUtNzE0MS00YTJmLWE0ZDctN2ZiYTk2YmI3NTYyXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg",
-      categories: ["Crime", "Drama", "Thriller"],
-      year: "2019"
-    },
-    {
-      title: "Avengers: Endgame",
-      rating: 8.4,
-      image: "https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzQ2NzM@._V1_.jpg",
-      categories: ["Action", "Adventure", "Drama"],
-      year: "2019"
-    },
-  ];
+  // Generate dropdown options dynamically
+  const allGenres = [...new Set(films.flatMap(film => film.genres))].sort();
+  const genres = ["All genres", ...allGenres];
+  
+  const allYears = [...new Set(films.map(film => film.year.toString()))].sort((a, b) => parseInt(b) - parseInt(a));
+  const years = ["Any year", ...allYears];
+  
+  const ratings = ["Any rating", "9+", "8+", "7+", "6+", "5+", "4+", "3+", "2+"];
 
   // State for filtered results
-  const [filteredMovies, setFilteredMovies] = useState(allMovies);
+  const [filteredMovies, setFilteredMovies] = useState<Film[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('searchTitle', searchTitle);
+    localStorage.setItem('selectedGenre', selectedGenre);
+    localStorage.setItem('selectedYear', selectedYear);
+    localStorage.setItem('selectedRating', selectedRating);
+    localStorage.setItem('currentPage', currentPage.toString());
+  }, [searchTitle, selectedGenre, selectedYear, selectedRating, currentPage]);
+
+  // Initialize filtered movies on component mount
+  useEffect(() => {
+    setFilteredMovies(sortFilms(films));
+    setTotalPages(Math.ceil(films.length / itemsPerPage));
+  }, [films, itemsPerPage]);
+
+  // Check if we should show navigation arrows based on screen width
+  useEffect(() => {
+    const checkWidth = () => {
+      setShowArrows(window.innerWidth <= 1024 && filteredMovies.length > 4);
+    };
+    
+    checkWidth(); // Initial check
+    window.addEventListener('resize', checkWidth);
+    
+    return () => window.removeEventListener('resize', checkWidth);
+  }, [filteredMovies.length]);
+
+  // Scroll to top of results when changing page
+  useEffect(() => {
+    if (searchResultsRef.current) {
+      searchResultsRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [currentPage]);
 
   // Apply filters whenever search criteria change
   useEffect(() => {
-    let results = allMovies;
+    let results = [...films];
 
     // Filter by title
     if (searchTitle.trim() !== "") {
@@ -120,14 +90,14 @@ const Search = () => {
     // Filter by genre
     if (selectedGenre !== "All genres") {
       results = results.filter(movie => 
-        movie.categories.includes(selectedGenre)
+        movie.genres.includes(selectedGenre)
       );
     }
 
     // Filter by year
     if (selectedYear !== "Any year") {
       results = results.filter(movie => 
-        movie.year === selectedYear
+        movie.year.toString() === selectedYear
       );
     }
 
@@ -139,8 +109,59 @@ const Search = () => {
       );
     }
 
+    // Sort results - new films first, then by year
+    results = sortFilms(results);
+
+    // Calculate total pages
+    setTotalPages(Math.ceil(results.length / itemsPerPage));
+    
+    // Reset to first page when filters change
+    setCurrentPage(1);
+
     setFilteredMovies(results);
-  }, [searchTitle, selectedGenre, selectedYear, selectedRating]);
+  }, [searchTitle, selectedGenre, selectedYear, selectedRating, films, itemsPerPage]);
+
+  // Get current page items
+  const getCurrentPageItems = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredMovies.slice(startIndex, endIndex);
+  };
+
+  // Handle pagination
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Scroll horizontally on mobile
+  const handleScrollLeft = () => {
+    if (searchResultsRef.current) {
+      searchResultsRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+    }
+  };
+
+  const handleScrollRight = () => {
+    if (searchResultsRef.current) {
+      searchResultsRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+    }
+  };
+
+  // Generate pagination buttons
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    for (let i = 1; i <= totalPages; i++) {
+      buttons.push(
+        <div 
+          key={i} 
+          className={`page-number ${currentPage === i ? 'active' : ''}`}
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </div>
+      );
+    }
+    return buttons;
+  };
 
   return (
     <main className="search-page">
@@ -194,25 +215,33 @@ const Search = () => {
           </div>
         </div>
 
-        <div className="search-results">
-          {filteredMovies.length > 0 ? (
-            filteredMovies.map((film, index) => (
+        <div className="search-results-container">
+          {showArrows && (
+            <>
+              <button className="arrow-nav arrow-left" onClick={handleScrollLeft}>&lt;</button>
+              <button className="arrow-nav arrow-right" onClick={handleScrollRight}>&gt;</button>
+            </>
+          )}
+          
+          <div ref={searchResultsRef} className="search-results">
+            {getCurrentPageItems().length > 0 ? (
+              getCurrentPageItems().map((film) => (
               <FilmsCard 
-                key={index} 
-                title={film.title} 
-                rating={film.rating} 
-                image={film.image} 
-                categories={film.categories} 
+                  key={film.id} 
+                  film={film} 
               />
             ))
           ) : (
             <div className="no-results">No movies found matching your criteria</div>
           )}
         </div>
-
-        <div className="pagination">
-          <div className="page-number">1</div>
         </div>
+
+        {totalPages > 1 && (
+          <div className="pagination">
+            {renderPaginationButtons()}
+          </div>
+        )}
       </div>
     </main>
   );

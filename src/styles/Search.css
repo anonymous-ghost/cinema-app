@@ -5,11 +5,19 @@
   color: white;
 }
 
+.search-page .container {
+  width: 90%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
 .search-title {
   font-size: 2.5rem;
   text-align: center;
   margin-bottom: 10px;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .search-subtitle {
@@ -92,21 +100,119 @@
   border: 0;
 }
 
-.search-results {
-  padding-left: 55px;
-  padding-right: 55px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 30px;
+.search-results-container {
+  position: relative;
+  width: 100%;
   margin-bottom: 40px;
-  justify-content: center;
 }
 
+.search-results {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 0 20px;
+  min-height: 400px;
+}
+
+/* Adjust FilmsCard for search layout */
+.search-page .films-card {
+  width: 200px;
+  height: 430px;
+  margin-bottom: 15px;
+}
+
+.search-page .poster-container img {
+  height: 300px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.search-page .film-name {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.search-page .movie-rating {
+  font-size: 14px;
+}
+
+.search-page .film-category {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.search-page .name-category {
+  font-size: 12px;
+  padding: 4px 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+/* Horizontal scroll for search results */
+@media (max-width: 1024px) {
+  .search-results {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    padding-bottom: 20px;
+    max-width: 100%;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+
+  .search-results::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  .search-page .films-card {
+    flex: 0 0 auto;
+  }
+}
+
+/* Next/Previous arrow buttons for horizontal scroll */
+.arrow-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 10;
+  border: none;
+  outline: none;
+  transition: background-color 0.2s;
+}
+
+.arrow-nav:hover {
+  background-color: rgba(229, 9, 20, 0.8);
+}
+
+.arrow-left {
+  left: 10px;
+}
+
+.arrow-right {
+  right: 10px;
+}
+
+/* Pagination styling */
 .pagination {
   display: flex;
   justify-content: center;
   margin-top: 30px;
   margin-bottom: 30px;
+  gap: 10px;
 }
 
 .page-number {
@@ -119,6 +225,18 @@
   border-radius: 50%;
   font-size: 1rem;
   font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.page-number:hover {
+  background-color: #e50914;
+  transform: scale(1.05);
+}
+
+.page-number.active {
+  background-color: #e50914;
+  color: white;
 }
 
 .no-results {
@@ -127,4 +245,27 @@
   padding: 40px 0;
   font-size: 1.2rem;
   color: #a0a0a0;
+}
+
+/* Responsive styling for mobile */
+@media (max-width: 768px) {
+  .filters-wrapper {
+    flex-direction: column;
+  }
+  
+  .search-page .container {
+    width: 95%;
+  }
+  
+  .pagination {
+    flex-wrap: wrap;
+  }
+}
+
+.search-page .films-info-card {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-grow: 1;
 }

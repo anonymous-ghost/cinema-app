@@ -46,7 +46,7 @@ const Bookings = () => {
   
   // Get film and session details
   const getBookingDetails = (booking: Booking) => {
-    const session = sessions.find(s => Number(s.id) === booking.sessionId);
+    const session = sessions.find(s => s.id === booking.sessionId.toString());
     const film = session ? films.find(f => f.id === session.filmId) : null;
     
     return { film, session };
