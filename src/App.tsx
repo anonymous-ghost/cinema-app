@@ -24,6 +24,7 @@ import Bookings from "./Pages/Bookings";
 import Checkout from "./Pages/Checkout";
 import { Search } from "lucide-react";
 
+
 const App = () => {
   return (
   <Router>

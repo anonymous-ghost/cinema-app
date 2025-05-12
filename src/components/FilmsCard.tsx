@@ -1,6 +1,7 @@
-// import { useState, useEffect } from "react";
+
+import { useState, useEffect } from "react";
 import { Film } from "../types";
-import { Link, /*useNavigate*/ } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../hooks/useToast";
 import { useFavorites } from "../contexts/FavoritesContext";
@@ -13,7 +14,8 @@ const FilmsCard: React.FC<FilmsCardProps> = ({ film }) => {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
+
   
   if (!film) {
     return null; // Don't render anything if no film is provided

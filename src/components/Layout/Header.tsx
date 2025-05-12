@@ -24,6 +24,7 @@ const Header = () => {
           )}
         </div>
         <div className="header-info">
+
           <Link className="header-search" to="/search">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -37,6 +38,7 @@ const Header = () => {
             </svg>
             Search
           </Link>
+
           
           {isAuthenticated ? (
             <div className="user-menu">
@@ -87,4 +89,6 @@ const Header = () => {
   );
 };
 
+
 export default Header;
+
