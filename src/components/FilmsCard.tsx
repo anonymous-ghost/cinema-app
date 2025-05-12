@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Film } from "../types";
 import { Link, useNavigate } from "react-router-dom";
@@ -14,6 +15,7 @@ const FilmsCard: React.FC<FilmsCardProps> = ({ film }) => {
   const { toast } = useToast();
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
   const navigate = useNavigate();
+
   
   if (!film) {
     return null; // Don't render anything if no film is provided

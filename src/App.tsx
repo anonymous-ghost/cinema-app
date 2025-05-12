@@ -22,6 +22,8 @@ import Register from "./Pages/Register";
 import Profile from "./Pages/Profile";
 import Bookings from "./Pages/Bookings";
 import Checkout from "./Pages/Checkout";
+import { Search } from "lucide-react";
+
 
 const App = () => {
   return (
@@ -42,6 +44,7 @@ const App = () => {
                 <Route path="/movie/:id" element={<MoviePage />} />
                 <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/favorites" element={<Favorites />} />
+                <Route path="/search" element={<Search />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/profile" element={<Profile />} />
