@@ -1,29 +1,25 @@
 import FilmsCard from "../components/FilmsCard";
+import { useFilms } from "../contexts/FilmsContext";
+import { sortFilms } from "../utils/filmSort";
 
 const Home = () => {
-  // Додаємо два нові фільми з різними жанрами та рейтингами
-  const films = [
-    
-    // Додаємо решту фільмів як заглушки
-    ...Array(10).fill(null)
-  ];
+  const { films } = useFilms();
 
   return (
     <main>
-      <div className="container">
-        <div className="main-text">
-          <h1 className="text-netflix">NETFLIX MOVIES</h1>
+      <div className="container" style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        <div className="main-text" style={{ textAlign: "center", marginBottom: "30px" }}>
+          <h1 className="text-netflix">CINEMA MOVIES</h1>
           <h3 className="text-current">Current and New Releases</h3>
         </div>
-        <div className="films">
-          {films.map((film, index) => (
-            <FilmsCard 
-              key={index} 
-              title={film?.title} 
-              rating={film?.rating} 
-              image={film?.image} 
-              categories={film?.categories} 
-            />
+        <div className="films" style={{ 
+          display: "flex", 
+          flexWrap: "wrap", 
+          justifyContent: "center",
+          gap: "20px"
+        }}>
+          {sortFilms(films).map((film) => (
+            <FilmsCard key={film.id} film={film} />
           ))}
         </div>
       </div>

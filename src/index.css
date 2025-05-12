@@ -29,10 +29,12 @@
   position: absolute;
   width: 23px;
   height: 32px;
-  right: 0px;
+  right: 10px;
+  top: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 5;
 }
 
 #toggle-heart.liked {
@@ -78,22 +80,6 @@
   }
 }
 
-/* @keyframes bubble {
-  15% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
-    border-color: #cc8ef5;
-    border-width: 2.25rem;
-  }
-  30%,
-  100% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
-    border-color: #cc8ef5;
-    border-width: 0;
-  }
-} */
-
 @keyframes sparkles {
   0%,
   20% {
@@ -109,6 +95,20 @@
 
 body {
   font-family: "Roboto", sans-serif;
+  min-height: 100vh;
+  position: relative;
+}
+
+main {
+  flex: 1;
+}
+
+footer {
+  position: relative;
+  width: 100%;
+  background-color: rgb(23, 23, 23);
+  z-index: 100;
+  bottom: 0;
 }
 
 header {
@@ -140,6 +140,7 @@ header {
   right: 182px;
   display: flex;
   gap: 35px;
+  align-items: center;
 }
 
 .header-search {
@@ -149,8 +150,10 @@ header {
   font-size: 15px;
   justify-content: center;
 }
+
 .bi {
   padding-right: 3px;
+  padding-top: 4px;
 }
 
 .header-cart {
@@ -159,10 +162,6 @@ header {
   color: #a1a1a3;
   font-size: 15px;
   justify-content: center;
-}
-
-.container {
-  background-color: black;
 }
 
 .main-text {
@@ -209,15 +208,22 @@ header {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
   transition: transform 0.3s ease;
   height: 430px;
+  display: flex;
+  flex-direction: column;
 }
 
 .films-card:hover {
   transform: scale(1.03);
 }
 
-.films-card > img {
+.poster-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.poster-container > img {
   width: 100%;
-  height: auto;
+  height: 300px;
   display: block;
   object-fit: cover;
 }
@@ -227,6 +233,7 @@ header {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex-grow: 1;
 }
 
 .film-name {
@@ -249,16 +256,50 @@ header {
 .film-category {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 5px;
+  gap: 6px;
 }
 
 .name-category {
-  font-size: 11px;
-  padding: 3px 6px;
+  font-size: 12px;
+  padding: 4px 8px;
   background-color: #252525;
   border-radius: 6px;
   color: #ccc;
+}
+
+.film-category .name-category {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* NEW tag styling */
+.new-release-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #e50914;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Date added styling for favorites */
+.date-added {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 11px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  z-index: 5;
 }
 
 .footer {
@@ -342,7 +383,7 @@ header {
   transition: opacity 0.3s ease, transform 0.3s ease;
   user-select: text;
   white-space: pre-line;
-  pointer-events: none; /* пока мышка не наведена */
+  pointer-events: none;
   width: 230px;
   z-index: 100;
 }
@@ -351,7 +392,7 @@ header {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
-  pointer-events: auto; /* чтобы можно было кликать, копировать текст */
+  pointer-events: auto;
 }
 
 .footer-bottom {
@@ -381,7 +422,7 @@ header {
 .contact-link::after {
   content: "";
   position: absolute;
-  bottom: 0; /* полоска снизу */
+  bottom: 0;
   left: 0;
   height: 2px;
   width: 0;
@@ -398,7 +439,6 @@ header {
   width: 100%;
 }
 
-/* Для красивого ухода справа налево */
 .pages-link:not(:hover)::after,
 .footer-pages:not(:hover)::after,
 .contact-link:not(:hover)::after,
@@ -408,3 +448,117 @@ header {
   width: 0;
   transition: all 0.4s ease;
 }
+
+/* User menu styles */
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  margin-left: 20px;
+}
+
+.user-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.user-dropdown-btn {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: #a1a1a3;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.user-dropdown-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #1f1f1f;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+  z-index: 1000;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dropdown-content a, 
+.dropdown-content button {
+  color: #a1a1a3;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+  width: 100%;
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.dropdown-content a:hover, 
+.dropdown-content button:hover {
+  background-color: #2a2a2a;
+  color: #fff;
+}
+
+.user-dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.logout-link {
+  color: #e50914 !important;
+  border-top: 1px solid #333 !important;
+}
+
+.auth-links {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.login-link, 
+.register-link {
+  text-decoration: none;
+  padding: 7px 14px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s;
+  border: 1px solid #e50914;
+  min-width: 80px;
+  text-align: center;
+  display: inline-block;
+  letter-spacing: 0.3px;
+}
+
+.login-link {
+  color: #fff;
+  background-color: transparent;
+}
+
+.login-link:hover {
+  background-color: rgba(229, 9, 20, 0.1);
+}
+
+.register-link {
+  color: #fff;
+  background-color: rgba(229, 9, 20, 0.15);
+}
+
+.register-link:hover {
+  background-color: rgba(229, 9, 20, 0.25);
+}
+
