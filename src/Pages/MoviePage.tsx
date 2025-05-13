@@ -59,7 +59,7 @@ const MoviePage = () => {
 
   // Map our Film type to the expected Movie type for components
   const mappedMovie = {
-    id: movie.id,
+    id: parseInt(movie.id),
     title: movie.title,
     description: movie.description,
     posterUrl: movie.posterUrl,
@@ -74,8 +74,8 @@ const MoviePage = () => {
 
   // Map our sessions to the expected format
   const mappedSessions = movieSessions.map(session => ({
-    id: session.id,
-    movieId: session.filmId,
+    id: parseInt(session.id),
+    movieId: parseInt(session.filmId),
     date: session.date,
     time: session.time,
     occupiedSeats: [] // Default value
@@ -83,7 +83,7 @@ const MoviePage = () => {
 
   // Map recommendations
   const mappedRecommendations = recommendations.map(film => ({
-    id: film.id,
+    id: parseInt(film.id),
     title: film.title,
     description: film.description,
     posterUrl: film.posterUrl,
