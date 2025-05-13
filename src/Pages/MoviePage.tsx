@@ -5,13 +5,20 @@ import MovieTabs from "@/components/movie/MovieTabs";
 import MovieSidebar from "@/components/movie/MovieSidebar";
 import { useFilms } from "../contexts/FilmsContext";
 import { useSessions } from "../contexts/SessionsContext";
-import { Film } from "../types";
-import { sortFilms } from "../utils/filmSort";
+import { Movie } from "@/types/movie";
+import { useState, useEffect } from "react";
+
+// Helper function to get random items from an array
+const getRandomItems = (array: any[], count: number) => {
+  const shuffled = [...array].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+};
 
 const MoviePage = () => {
   const { id } = useParams<{ id: string }>();
-  const { films } = useFilms();
+  const { films, setFilms } = useFilms();
   const { sessions } = useSessions();
+  const [mappedMovie, setMappedMovie] = useState<Movie | null>(null);
   
   // Find the current movie
   const movie = films.find(film => film.id === id);
@@ -19,12 +26,60 @@ const MoviePage = () => {
   // Get sessions for this movie
   const movieSessions = sessions.filter(session => session.filmId === id);
   
-  // Get recommendations (other movies), sorted with new films first
-  const recommendations = sortFilms(
-    films.filter(film => film.id !== id)
-  ).slice(0, 4);
+  // Get recommendations (random movies, excluding current)
+  const recommendations = getRandomItems(
+    films.filter(film => film.id !== id),
+    4
+  );
 
-  if (!movie) {
+  // Set up the mapped movie whenever the film changes
+  useEffect(() => {
+    if (movie) {
+      setMappedMovie({
+        id: parseInt(movie.id),
+        title: movie.title,
+        description: movie.description,
+        posterUrl: movie.posterUrl,
+        trailerUrl: movie.trailerUrl || "",
+        ageRating: movie.ageRating || "13+",
+        rating: movie.rating,
+        originalRating: movie.rating,
+        releaseYear: movie.year,
+        runtime: movie.runtime || "2 hrs",
+        genres: movie.genres,
+        cast: movie.cast
+      });
+    }
+  }, [movie]);
+
+  // Handle movie updates (like when ratings change from reviews)
+  const handleMovieUpdate = (updatedMovie: Movie) => {
+    // Update the local state
+    setMappedMovie(updatedMovie);
+    
+    // Update the global films context
+    setFilms(prevFilms => 
+      prevFilms.map(film => {
+        if (film.id === id) {
+          // Get the true original rating (before any reviews)
+          // If this is the first update, store the current rating as original
+          // Otherwise, keep the existing originalRating
+          const trueOriginalRating = film.originalRating !== undefined ? 
+            film.originalRating : 
+            film.rating;
+          
+          return {
+            ...film,
+            rating: updatedMovie.rating,
+            originalRating: trueOriginalRating
+          };
+        }
+        return film;
+      })
+    );
+  };
+
+  if (!movie || !mappedMovie) {
     return (
       <div className="container mx-auto px-6 py-8">
         <div className="animate-pulse">
@@ -57,21 +112,6 @@ const MoviePage = () => {
     );
   }
 
-  // Map our Film type to the expected Movie type for components
-  const mappedMovie = {
-    id: parseInt(movie.id),
-    title: movie.title,
-    description: movie.description,
-    posterUrl: movie.posterUrl,
-    trailerUrl: movie.trailerUrl || "",
-    ageRating: movie.ageRating || "13+",
-    rating: movie.rating,
-    releaseYear: movie.year,
-    runtime: "2 hrs", // Default value
-    genres: movie.genres,
-    cast: movie.cast
-  };
-
   // Map our sessions to the expected format
   const mappedSessions = movieSessions.map(session => ({
     id: parseInt(session.id),
@@ -91,7 +131,7 @@ const MoviePage = () => {
     ageRating: film.ageRating || "13+",
     rating: film.rating,
     releaseYear: film.year,
-    runtime: "2 hrs", // Default value
+    runtime: film.runtime || "2 hrs",
     genres: film.genres,
     cast: film.cast
   }));
@@ -108,7 +148,11 @@ const MoviePage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <div className="lg:col-span-3">
           <MovieDetails movie={mappedMovie} />
-          <MovieTabs movie={mappedMovie} sessions={mappedSessions} />
+          <MovieTabs 
+            movie={mappedMovie} 
+            sessions={mappedSessions}
+            onMovieUpdate={handleMovieUpdate}
+          />
         </div>
         
         <div className="lg:col-span-1">

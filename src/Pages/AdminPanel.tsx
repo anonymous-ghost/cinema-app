@@ -9,6 +9,7 @@ import { useFilms } from "../contexts/FilmsContext";
 import { useSessions } from "../contexts/SessionsContext";
 import { useAuth } from "../contexts/AuthContext";
 import { sortFilms } from "../utils/filmSort";
+import AdminReviews from "../components/admin/AdminReviews";
 
 // Повний список жанрів
 const ALL_GENRES = [
@@ -23,31 +24,31 @@ const AGE_RATINGS = ["G", "PG", "12+", "13+", "16+", "18+", "R"];
 export const MOCK_FILMS: Film[] = [
   {
     id: "1",
-    title: "Magic travel to Archem",
+    title: "Avatar: The Way of Water",
     description: "Jake Sully lives with his newfound family formed on the planet of Pandora.",
     posterUrl: "https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjQxNTE1MDA@._V1_FMjpg_UX1000_.jpg",
     cast: ["Sam Worthington", "Zoe Saldana"],
-    year: 2025,
-    genres: ["Fantasy", "Adventure", "Magic"],
+    year: 2022,
+    genres: ["Fantasy", "Adventure", "Sci-Fi"],
     rating: 8.8,
     trailerUrl: "https://www.youtube.com/watch?v=d9MyW72ELq0",
     isNew: true,
     ageRating: "13+",
-    runtime: "2 hrs 30 min"
+    runtime: "3 hrs 12 min"
   },
   {
     id: "2",
-    title: "Magic travel to Archem 2",
+    title: "The Batman",
     description: "When a sadistic serial killer begins murdering key political figures in Gotham, Batman is forced to investigate.",
     posterUrl: "https://m.media-amazon.com/images/M/MV5BMDdmMTBiNTYtMDIzNi00NGVlLWIzMDYtZTk3MTQ3NGQxZGEwXkEyXkFqcGdeQXVyMzMwOTU5MDk@._V1_.jpg",
     cast: ["Robert Pattinson", "Zoë Kravitz"],
-    year: 2024,
-    genres: ["Fantasy", "Adventure", "Magic"],
+    year: 2022,
+    genres: ["Action", "Crime", "Drama"],
     rating: 8.8,
     trailerUrl: "https://www.youtube.com/watch?v=mqqft2x_Aa4",
     isNew: true,
     ageRating: "16+",
-    runtime: "2 hrs 15 min"
+    runtime: "2 hrs 56 min"
   },
   {
     id: "3",
@@ -91,16 +92,16 @@ export const MOCK_FILMS: Film[] = [
   },
   {
     id: "6",
-    title: "The Batman",
-    description: "When a sadistic serial killer begins murdering key political figures in Gotham, Batman is forced to investigate the city's hidden corruption and question his family's involvement.",
-    posterUrl: "https://m.media-amazon.com/images/M/MV5BMDdmMTBiNTYtMDIzNi00NGVlLWIzMDYtZTk3MTQ3NGQxZGEwXkEyXkFqcGdeQXVyMzMwOTU5MDk@._V1_.jpg",
-    cast: ["Robert Pattinson", "Zoë Kravitz", "Jeffrey Wright"],
-    year: 2022,
+    title: "Batman Begins",
+    description: "After training with his mentor, Batman begins his fight to free crime-ridden Gotham City from corruption.",
+    posterUrl: "https://m.media-amazon.com/images/M/MV5BOTY4YjI2N2MtYmFlMC00ZjcyLTg3YjEtMDQyM2ZjYzQ5YWFkXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg",
+    cast: ["Christian Bale", "Michael Caine", "Katie Holmes"],
+    year: 2005,
     genres: ["Action", "Crime", "Drama"],
-    rating: 8.3,
-    trailerUrl: "https://www.youtube.com/watch?v=mqqft2x_Aa4",
-    ageRating: "16+",
-    runtime: "2 hrs 56 min"
+    rating: 8.2,
+    trailerUrl: "https://www.youtube.com/watch?v=neY2xVmOfUM",
+    ageRating: "12+",
+    runtime: "2 hrs 20 min"
   },
   {
     id: "7",
@@ -197,7 +198,7 @@ const GENRE_OPTIONS = ALL_GENRES.map(genre => ({ value: genre, label: genre }));
 const AdminPanel: React.FC = () => {
   const { films, setFilms } = useFilms();
   const { sessions, setSessions } = useSessions();
-  const { isAdmin, isAuthenticated } = useAuth();
+  const { isAdmin, isAuthenticated, currentUser } = useAuth();
   const navigate = useNavigate();
   
   const [isFilmDialogOpen, setIsFilmDialogOpen] = useState(false);
@@ -491,6 +492,14 @@ const AdminPanel: React.FC = () => {
                 })}
               </tbody>
             </table>
+          </div>
+          {/* Reviews Section */}
+          <div className="admin-section">
+            <AdminReviews 
+              films={films} 
+              onFilmsUpdate={setFilms} 
+              currentUserId={currentUser?.id}
+            />
           </div>
           {/* Film Dialog */}
           <Dialog open={isFilmDialogOpen} onOpenChange={setIsFilmDialogOpen} title={editingFilm ? "Edit Movie" : "Add Movie"}>
