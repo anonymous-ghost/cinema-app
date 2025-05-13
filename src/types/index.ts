@@ -7,6 +7,7 @@ export interface Film {
   year: number;
   genres: string[];
   rating: number;
+  originalRating?: number;
   trailerUrl?: string;
   isNew?: boolean;
   ageRating?: string;

@@ -6,6 +6,7 @@ export interface Movie {
   trailerUrl: string;
   ageRating: string;
   rating: number;
+  originalRating?: number;
   genres: string[];
   releaseYear: number;
   runtime: string;
@@ -69,4 +70,23 @@ export enum PaymentStatus {
   COMPLETED = 'completed',
   FAILED = 'failed',
   REFUNDED = 'refunded'
+}
+
+export interface Review {
+  id: string;
+  movieId: number;
+  author: string;
+  text: string;
+  rating: number; // 1-10 rating
+  createdAt: string; // ISO date string
+  userId?: string; // Optional for backward compatibility with existing reviews
+}
+
+// Interface for review data when submitting a new review or editing
+export interface ReviewSubmitData {
+  movieId: number;
+  author: string;
+  text: string;
+  rating: number;
+  userId?: string;
 }
