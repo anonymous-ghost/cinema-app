@@ -29,10 +29,12 @@
   position: absolute;
   width: 23px;
   height: 32px;
-  right: 0px;
+  right: 10px;
+  top: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 5;
 }
 
 #toggle-heart.liked {
@@ -138,6 +140,7 @@ header {
   right: 182px;
   display: flex;
   gap: 35px;
+  align-items: center;
 }
 
 .header-search {
@@ -150,6 +153,7 @@ header {
 
 .bi {
   padding-right: 3px;
+  padding-top: 4px;
 }
 
 .header-cart {
@@ -204,15 +208,22 @@ header {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
   transition: transform 0.3s ease;
   height: 430px;
+  display: flex;
+  flex-direction: column;
 }
 
 .films-card:hover {
   transform: scale(1.03);
 }
 
-.films-card > img {
+.poster-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.poster-container > img {
   width: 100%;
-  height: auto;
+  height: 300px;
   display: block;
   object-fit: cover;
 }
@@ -222,6 +233,7 @@ header {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex-grow: 1;
 }
 
 .film-name {
@@ -253,6 +265,41 @@ header {
   background-color: #252525;
   border-radius: 6px;
   color: #ccc;
+}
+
+.film-category .name-category {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* NEW tag styling */
+.new-release-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #e50914;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Date added styling for favorites */
+.date-added {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 11px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  z-index: 5;
 }
 
 .footer {
@@ -400,5 +447,118 @@ header {
   transform: translateX(100%);
   width: 0;
   transition: all 0.4s ease;
+}
+
+/* User menu styles */
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  margin-left: 20px;
+}
+
+.user-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.user-dropdown-btn {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: #a1a1a3;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.user-dropdown-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #1f1f1f;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+  z-index: 1000;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dropdown-content a, 
+.dropdown-content button {
+  color: #a1a1a3;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+  width: 100%;
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.dropdown-content a:hover, 
+.dropdown-content button:hover {
+  background-color: #2a2a2a;
+  color: #fff;
+}
+
+.user-dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.logout-link {
+  color: #e50914 !important;
+  border-top: 1px solid #333 !important;
+}
+
+.auth-links {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.login-link, 
+.register-link {
+  text-decoration: none;
+  padding: 7px 14px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s;
+  border: 1px solid #e50914;
+  min-width: 80px;
+  text-align: center;
+  display: inline-block;
+  letter-spacing: 0.3px;
+}
+
+.login-link {
+  color: #fff;
+  background-color: transparent;
+}
+
+.login-link:hover {
+  background-color: rgba(229, 9, 20, 0.1);
+}
+
+.register-link {
+  color: #fff;
+  background-color: rgba(229, 9, 20, 0.15);
+}
+
+.register-link:hover {
+  background-color: rgba(229, 9, 20, 0.25);
 }
 

@@ -1,104 +1,146 @@
 import { useState } from "react";
 import "../styles/Sessions.css";
 import SeatSelector from "../components/SeatSelector";
+import { useFilms } from "../contexts/FilmsContext";
+import { useSessions } from "../contexts/SessionsContext";
+import { Session as SessionType } from "../types";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { useToast } from "../hooks/useToast";
+import { BookingStatus } from "../types/movie";
+import { useBookings } from "../contexts/BookingsContext";
 
-interface Session {
-  id: number;
-  movieTitle: string;
-  date: string;
-  time: string;
-  genre: string;
-  hall: string;
-  image: string;
-}
+// Повний список жанрів
+const ALL_GENRES = [
+  "Action", "Adventure", "Animation", "Biography", "Comedy", "Crime", 
+  "Documentary", "Drama", "Family", "Fantasy", "History", "Horror", 
+  "Magic", "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western"
+];
 
 const Sessions = () => {
   const [dateFilter, setDateFilter] = useState<string>("");
   const [timeFilter, setTimeFilter] = useState<string>("");
   const [genreFilter, setGenreFilter] = useState<string>("");
   const [showSeatSelector, setShowSeatSelector] = useState(false);
-  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [selectedSession, setSelectedSession] = useState<SessionType | null>(null);
+  const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
+  const [showBookingOptions, setShowBookingOptions] = useState(false);
+  const [processedSeats, setProcessedSeats] = useState<{row: number, seat: number}[]>([]);
 
-  // Mock data for sessions - in a real app, this would come from an API
-  const sessions: Session[] = [
-    {
-      id: 1,
-      movieTitle: "Avatar",
-      date: "2023-07-15",
-      time: "18:30",
-      genre: "Action",
-      hall: "Hall 1",
-      image: "https://new.kinogo.fm/uploads/posts/2022-03/251733_1647372642.webp",
-    },
-    {
-      id: 2,
-      movieTitle: "The Matrix",
-      date: "2023-07-15",
-      time: "20:00",
-      genre: "Sci-Fi",
-      hall: "Hall 2",
-      image: "https://new.kinogo.fm/uploads/posts/2022-03/251733_1647372642.webp",
-    },
-    {
-      id: 3,
-      movieTitle: "Inception",
-      date: "2023-07-16",
-      time: "19:00",
-      genre: "Thriller",
-      hall: "Hall 3",
-      image: "https://new.kinogo.fm/uploads/posts/2022-03/251733_1647372642.webp",
-    },
-    {
-      id: 4,
-      movieTitle: "Interstellar",
-      date: "2023-07-16",
-      time: "21:15",
-      genre: "Sci-Fi",
-      hall: "Hall 1",
-      image: "https://new.kinogo.fm/uploads/posts/2022-03/251733_1647372642.webp",
-    },
-    {
-      id: 5,
-      movieTitle: "The Dark Knight",
-      date: "2023-07-17",
-      time: "18:00",
-      genre: "Action",
-      hall: "Hall 2",
-      image: "https://new.kinogo.fm/uploads/posts/2022-03/251733_1647372642.webp",
-    },
-    {
-      id: 6,
-      movieTitle: "Pulp Fiction",
-      date: "2023-07-17",
-      time: "20:30",
-      genre: "Crime",
-      hall: "Hall 3",
-      image: "https://new.kinogo.fm/uploads/posts/2022-03/251733_1647372642.webp",
-    },
-  ];
+  // Get data from contexts
+  const { films } = useFilms();
+  const { sessions } = useSessions();
+  const { isAuthenticated, currentUser } = useAuth();
+  const { addBooking } = useBookings();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Filter sessions based on selected filters
   const filteredSessions = sessions.filter((session) => {
+    const film = films.find(f => f.id === session.filmId);
+    if (!film) return false;
+    
     const matchesDate = dateFilter ? session.date === dateFilter : true;
     const matchesTime = timeFilter
       ? session.time.startsWith(timeFilter)
       : true;
     const matchesGenre = genreFilter
-      ? session.genre === genreFilter
+      ? film.genres.includes(genreFilter)
       : true;
 
     return matchesDate && matchesTime && matchesGenre;
   });
 
   // Get unique options for filters
-  const dates = [...new Set(sessions.map((session) => session.date))];
-  const times = [...new Set(sessions.map((session) => session.time.split(":")[0]))];
-  const genres = [...new Set(sessions.map((session) => session.genre))];
+  const dates = [...new Set(sessions.map((session) => session.date))].sort();
+  const times = [...new Set(sessions.map((session) => session.time.split(":")[0]))].sort();
+  
+  // Використовуємо всі жанри + ті, що є у фільмах (на випадок, якщо є якісь додаткові)
+  const usedGenres = [...new Set(films.flatMap(film => film.genres))];
+  const allGenres = [...new Set([...ALL_GENRES, ...usedGenres])].sort();
 
   // Format date for display
   const formatDate = (dateString: string) => {
     const [year, month, day] = dateString.split("-");
     return `${day}.${month}.${year}`;
+  };
+
+  // Handle seat selection confirmation
+  const handleConfirmSeats = (seatNumbers: number[]) => {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      toast({ 
+        title: "Authentication required", 
+        description: "Please login to continue booking", 
+        variant: "destructive" 
+      });
+      navigate('/login');
+      return;
+    }
+    
+    if (!selectedSession) {
+      toast({ title: "No session selected", variant: "destructive" });
+      return;
+    }
+    
+    // Convert seat numbers to row/seat format
+    const seats = seatNumbers.map(seatNumber => {
+      const row = Math.floor(seatNumber / 8) + 1;
+      const seat = seatNumber % 8 + 1;
+      return { row, seat };
+    });
+    
+    // Store the processed seats for later use
+    setProcessedSeats(seats);
+    
+    // Show booking options modal
+    setShowBookingOptions(true);
+    setShowSeatSelector(false);
+  };
+  
+  // Handle "Pay Now" option
+  const handlePayNow = () => {
+    if (!selectedSession) return;
+    
+    // Navigate to checkout with selected session and seats
+    navigate(`/checkout/${selectedSession.id}`, {
+      state: { selectedSeats: processedSeats }
+    });
+    
+    setShowBookingOptions(false);
+  };
+  
+  // Handle "Add to Upcoming Bookings" option
+  const handleAddToUpcoming = () => {
+    if (!selectedSession || !currentUser) return;
+    
+    // Calculate total price
+    const totalPrice = processedSeats.length * selectedSession.price;
+    
+    // Create a new booking with RESERVED status
+    const newBooking = {
+      id: `booking_${Date.now()}`,
+      userId: currentUser.id,
+      sessionId: selectedSession.id,
+      seats: processedSeats,
+      totalPrice,
+      bookingDate: new Date().toISOString(),
+      status: BookingStatus.RESERVED
+    };
+    
+    // Add the booking
+    addBooking(newBooking);
+    
+    // Show success message
+    toast({ 
+      title: "Booking added", 
+      description: "Your booking has been added to Upcoming Bookings" 
+    });
+    
+    // Navigate to bookings page
+    navigate('/bookings');
+    
+    setShowBookingOptions(false);
   };
 
   // Calendar icon SVG
@@ -133,13 +175,13 @@ const Sessions = () => {
 
   return (
     <main className="sessions-page">
-      <div className="container">
-        <div className="main-text">
+      <div className="container" style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        <div className="main-text" style={{ textAlign: "center" }}>
           <h1 className="text-netflix">CINEMA SESSIONS</h1>
           <h3 className="text-current">View and filter our sessions</h3>
         </div>
 
-        <div className="filter-container">
+        <div className="filter-container" style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "15px" }}>
           <div className="filter-group">
             <label>Date:</label>
             <select
@@ -175,9 +217,10 @@ const Sessions = () => {
             <select
               value={genreFilter}
               onChange={(e) => setGenreFilter(e.target.value)}
+              style={{ minWidth: "150px" }}
             >
               <option value="">All Genres</option>
-              {genres.map((genre) => (
+              {allGenres.map((genre) => (
                 <option key={genre} value={genre}>
                   {genre}
                 </option>
@@ -197,61 +240,102 @@ const Sessions = () => {
           </button>
         </div>
 
-        <div className="sessions-list">
+        <div style={{ margin: "20px 0", textAlign: "center" }}>
+          <p>Showing {filteredSessions.length} of {sessions.length} sessions</p>
+        </div>
+
+        <div className="sessions-list" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
           {filteredSessions.length > 0 ? (
-            filteredSessions.map((session) => (
-              <div className="session-card" key={session.id}>
-                <div className="session-image">
-                  <img src={session.image} alt={session.movieTitle} />
-                </div>
-                <div className="session-info">
-                  <h3>{session.movieTitle}</h3>
-                  <div className="session-details">
-                    <p>
-                      <CalendarIcon />
-                      <strong>Date:</strong> {formatDate(session.date)}
-                    </p>
-                    <p>
-                      <ClockIcon />
-                      <strong>Time:</strong> {session.time}
-                    </p>
-                    <p>
-                      <TagIcon />
-                      <strong>Genre:</strong> {session.genre}
-                    </p>
-                    <p>
-                      <LocationIcon />
-                      <strong>Hall:</strong> {session.hall}
-                    </p>
+            filteredSessions.map((session) => {
+              const film = films.find(f => f.id === session.filmId);
+              if (!film) return null;
+              
+              return (
+                <div key={session.id} className="session-card" style={{ width: "100%", maxWidth: "800px" }}>
+                  <div className="session-image">
+                    <img src={film.posterUrl} alt={film.title} />
                   </div>
-                  <button 
-                    className="book-button" 
-                    onClick={() => {
-                      setSelectedSession(session);
-                      setShowSeatSelector(true);
-                    }}
-                  >
-                    Book Tickets
-                  </button>
+                  <div className="session-details">
+                    <h3 className="movie-title">
+                      <Link to={`/movie/${film.id}`}>{film.title}</Link>
+                    </h3>
+                    <div className="session-info">
+                      <p>
+                        <CalendarIcon /> {formatDate(session.date)}
+                      </p>
+                      <p>
+                        <ClockIcon /> {session.time}
+                      </p>
+                      <p>
+                        <TagIcon /> {film.genres.join(', ')}
+                      </p>
+                      <p>
+                        <LocationIcon /> {session.hall}
+                      </p>
+                    </div>
+                    <div className="session-actions">
+                      <button
+                        className="book-button"
+                        onClick={() => {
+                          setSelectedSession(session);
+                          setShowSeatSelector(true);
+                        }}
+                      >
+                        Book Tickets
+                      </button>
+                      <span className="price">{session.price} UAH</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
-            <div className="no-sessions">
-              <p>No sessions found matching your filters.</p>
+            <div className="no-sessions" style={{ textAlign: "center" }}>
+              <p>No sessions match your filter criteria.</p>
+              <button
+                className="reset-button"
+                onClick={() => {
+                  setDateFilter("");
+                  setTimeFilter("");
+                  setGenreFilter("");
+                }}
+              >
+                Reset Filters
+              </button>
             </div>
           )}
         </div>
-        {showSeatSelector && (
-          <SeatSelector
-            onClose={() => setShowSeatSelector(false)}
-            onConfirm={(seats) => {
-              console.log(`Booking seats ${seats.join(", ")} for ${selectedSession?.movieTitle}`);
-              setShowSeatSelector(false);
-            }}
-          />
-        )}
       </div>
+
+      {showSeatSelector && selectedSession && (
+        <SeatSelector 
+          onClose={() => setShowSeatSelector(false)} 
+          onConfirm={handleConfirmSeats} 
+        />
+      )}
+      
+      {showBookingOptions && selectedSession && (
+        <div className="booking-options-overlay">
+          <div className="booking-options-modal">
+            <h2>Booking Options</h2>
+            <p>You've selected {processedSeats.length} seats for a total of {processedSeats.length * selectedSession.price} UAH.</p>
+            <p>How would you like to proceed?</p>
+            
+            <div className="booking-options-buttons">
+              <button className="pay-now-button" onClick={handlePayNow}>
+                Pay Now
+              </button>
+              <button className="add-to-upcoming-button" onClick={handleAddToUpcoming}>
+                Add to Upcoming Bookings
+              </button>
+            </div>
+            
+            <button className="close-button" onClick={() => setShowBookingOptions(false)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 };

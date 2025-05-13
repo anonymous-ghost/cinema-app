@@ -1,106 +1,30 @@
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "wouter";
-import { Movie, Session } from "@/types/movie";
+import { useParams } from "react-router-dom";
 import { Breadcrumb } from "@/components/ui/MovieBreadcrumb";
 import MovieDetails from "@/components/movie/MovieDetails";
 import MovieTabs from "@/components/movie/MovieTabs";
 import MovieSidebar from "@/components/movie/MovieSidebar";
-
-// Placeholder data
-const stubMovie: Movie = {
-  id: 1,
-  title: "Some Movie",
-  description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  posterUrl: "https://i.imgur.com/SNeZhan.png",
-  trailerUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-  ageRating: "13+",
-  rating: 4.8,
-  releaseYear: 2023,
-  runtime: "2 hrs 10 min",
-  genres: ["Drama"],
-  cast: ["Leo De Vinci", "Hitori"]
-};
-
-const stubSessions: Session[] = [
-  {
-    id: 1,
-    movieId: 1,
-    date: "12.05.2024",
-    time: "12:00",
-    occupiedSeats: [
-      { row: 1, seat: 3 },
-      { row: 2, seat: 5 }
-    ]
-  },
-  {
-    id: 2,
-    movieId: 1,
-    date: "13.05.2024",
-    time: "18:00",
-    occupiedSeats: [
-      { row: 1, seat: 8 },
-      { row: 1, seat: 9 }
-    ]
-  }
-];
-
-const stubRecommendations: Movie[] = [
-  {
-    id: 2,
-    title: "Recommended 1",
-    description: "A good recommendation.",
-    posterUrl: "https://i.imgur.com/ubO63ru.png",
-    trailerUrl: "",
-    ageRating: "13+",
-    rating: 4.2,
-    releaseYear: 2022,
-    runtime: "1 hr 45 min",
-    genres: [],
-    cast: []
-  },
-  {
-    id: 3,
-    title: "Recommended 2",
-    description: "Another great movie.",
-    posterUrl: "https://i.imgur.com/ubO63ru.png",
-    trailerUrl: "",
-    ageRating: "16+",
-    rating: 4.5,
-    releaseYear: 2021,
-    runtime: "2 hrs",
-    genres: [],
-    cast: []
-  }
-];
-
+import { useFilms } from "../contexts/FilmsContext";
+import { useSessions } from "../contexts/SessionsContext";
+import { Film } from "../types";
+import { sortFilms } from "../utils/filmSort";
 
 const MoviePage = () => {
   const { id } = useParams<{ id: string }>();
-  const movieId = parseInt(id);
-
-  // My test API queries (can be safely removed)
-
-  // const { data: movie, isLoading: isLoadingMovie } = useQuery<Movie>({
-  //   queryKey: [`/api/movies/${movieId}`],
-  // });
-
-  // const { data: sessions, isLoading: isLoadingSessions } = useQuery<Session[]>({
-  //   queryKey: [`/api/movies/${movieId}/sessions`],
-  // });
-
-  // const { data: recommendations, isLoading: isLoadingRecommendations } = useQuery<Movie[]>({
-  //   queryKey: ['/api/movies/recommendations'],
-  // });
-
-  // Imitation loading data (without api)
+  const { films } = useFilms();
+  const { sessions } = useSessions();
   
-  const movie = stubMovie;
-  const sessions = stubSessions;
-  const recommendations = stubRecommendations;
+  // Find the current movie
+  const movie = films.find(film => film.id === id);
+  
+  // Get sessions for this movie
+  const movieSessions = sessions.filter(session => session.filmId === id);
+  
+  // Get recommendations (other movies), sorted with new films first
+  const recommendations = sortFilms(
+    films.filter(film => film.id !== id)
+  ).slice(0, 4);
 
-  // isLoadingMovie || isLoadingSessions || isLoadingRecommendations
-
-  if (!movie || !sessions || !recommendations) {
+  if (!movie) {
     return (
       <div className="container mx-auto px-6 py-8">
         <div className="animate-pulse">
@@ -133,24 +57,63 @@ const MoviePage = () => {
     );
   }
 
+  // Map our Film type to the expected Movie type for components
+  const mappedMovie = {
+    id: parseInt(movie.id),
+    title: movie.title,
+    description: movie.description,
+    posterUrl: movie.posterUrl,
+    trailerUrl: movie.trailerUrl || "",
+    ageRating: movie.ageRating || "13+",
+    rating: movie.rating,
+    releaseYear: movie.year,
+    runtime: "2 hrs", // Default value
+    genres: movie.genres,
+    cast: movie.cast
+  };
+
+  // Map our sessions to the expected format
+  const mappedSessions = movieSessions.map(session => ({
+    id: parseInt(session.id),
+    movieId: parseInt(session.filmId),
+    date: session.date,
+    time: session.time,
+    occupiedSeats: [] // Default value
+  }));
+
+  // Map recommendations
+  const mappedRecommendations = recommendations.map(film => ({
+    id: parseInt(film.id),
+    title: film.title,
+    description: film.description,
+    posterUrl: film.posterUrl,
+    trailerUrl: film.trailerUrl || "",
+    ageRating: film.ageRating || "13+",
+    rating: film.rating,
+    releaseYear: film.year,
+    runtime: "2 hrs", // Default value
+    genres: film.genres,
+    cast: film.cast
+  }));
+
   return (
     <div className="container mx-auto px-6 py-8">
       <Breadcrumb
         items={[
           { label: "Main page", href: "/" },
-          { label: movie.title }
+          { label: mappedMovie.title }
         ]}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <div className="lg:col-span-3">
-          <MovieDetails movie={movie} />
-          <MovieTabs movie={movie} sessions={sessions} />
+          <MovieDetails movie={mappedMovie} />
+          <MovieTabs movie={mappedMovie} sessions={mappedSessions} />
         </div>
         
         <div className="lg:col-span-1">
           <MovieSidebar 
-            recommendations={recommendations}
+            recommendations={mappedRecommendations}
             adImageUrl="https://i.imgur.com/ljfaW3J.png"
           />
         </div>
