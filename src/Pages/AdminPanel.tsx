@@ -10,6 +10,7 @@ import { useSessions } from "../contexts/SessionsContext";
 import { useAuth } from "../contexts/AuthContext";
 import { sortFilms } from "../utils/filmSort";
 import AdminReviews from "../components/admin/AdminReviews";
+import ClearStorage from "../components/ClearStorage";
 
 // Повний список жанрів
 const ALL_GENRES = [
@@ -413,7 +414,10 @@ const AdminPanel: React.FC = () => {
                 <h2 className="netflix-title">NETFLIX MOVIES</h2>
                 <p className="section-subtitle">Manage your movie catalog</p>
               </div>
-              <button className="netflix-button" onClick={() => setIsFilmDialogOpen(true)}>Add Movie</button>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button className="netflix-button" onClick={() => setIsFilmDialogOpen(true)}>Add Movie</button>
+                <ClearStorage />
+              </div>
             </div>
             <table className="netflix-table">
               <thead>
@@ -614,22 +618,6 @@ const AdminPanel: React.FC = () => {
                   {AGE_RATINGS.map(rating => (
                     <option key={rating} value={rating}>{rating}</option>
                   ))}
-                </select>
-              </div>
-              
-              <div className="form-actions">
-                <button type="button" className="admin-btn admin-btn-secondary" onClick={() => setIsFilmDialogOpen(false)}>Cancel</button>
-                <button type="submit" className="admin-btn admin-btn-primary">Save</button>
-              </div>
-            </form>
-          </Dialog>
-          {/* Session Dialog */}
-          <Dialog open={isSessionDialogOpen} onOpenChange={setIsSessionDialogOpen} title={editingSession ? "Edit Session" : "Add Session"}>
-            <form onSubmit={handleSaveSession} className="space-y-4">
-              <div className="form-group">
-                <label className="form-label">Movie</label>
-                <select name="filmId" value={sessionForm.filmId} onChange={handleSessionFormChange} className="form-select" required>
-                  {films.map(film => (<option key={film.id} value={film.id}>{film.title}</option>))}
                 </select>
               </div>
               
