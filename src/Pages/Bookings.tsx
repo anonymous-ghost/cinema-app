@@ -52,19 +52,29 @@ const Bookings = () => {
     return { film, session };
   };
   
+  // Format date for debugging
+  const formatDateForDebug = (date: Date) => {
+    return date.toISOString();
+  };
+
   // Filter bookings based on active tab
   const filteredBookings = userBookings.filter(booking => {
     const { session } = getBookingDetails(booking);
     
     if (!session) return false;
     
-    const sessionDate = new Date(`${session.date}T${session.time}`);
-    const now = new Date();
+    // Skip cancelled bookings entirely
+    if (booking.status === BookingStatus.CANCELLED) return false;
+    
+    // For debugging
+    console.log(`Booking ${booking.id} - Status: ${booking.status}`);
     
     if (activeTab === 'upcoming') {
-      return sessionDate > now || booking.status === BookingStatus.RESERVED;
+      // Upcoming tab: ONLY show RESERVED status bookings
+      return booking.status === BookingStatus.RESERVED;
     } else {
-      return sessionDate < now && booking.status === BookingStatus.PAID;
+      // Past tab: ONLY show PAID status bookings
+      return booking.status === BookingStatus.PAID;
     }
   });
   
