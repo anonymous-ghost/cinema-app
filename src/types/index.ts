@@ -14,6 +14,11 @@ export interface Film {
   runtime?: string;
 }
 
+export interface Seat {
+  row: number;
+  seat: number;
+}
+
 export interface Session {
   id: string;
   filmId: string;
@@ -21,6 +26,7 @@ export interface Session {
   time: string;
   price: number;
   hall: string;
+  occupiedSeats: Seat[];
 }
 
 export interface User {
