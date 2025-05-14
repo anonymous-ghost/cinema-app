@@ -19,8 +19,8 @@ export interface Seat {
 }
 
 export interface Session {
-  id: number;
-  movieId: number;
+  id: string;
+  movieId: string;
   date: string;
   time: string;
   occupiedSeats: Seat[];

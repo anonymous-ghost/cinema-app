@@ -62,9 +62,11 @@ const Bookings = () => {
     const now = new Date();
     
     if (activeTab === 'upcoming') {
-      return sessionDate > now || booking.status === BookingStatus.RESERVED;
+      // Only show upcoming bookings that are not paid yet
+      return booking.status === BookingStatus.RESERVED && sessionDate > now;
     } else {
-      return sessionDate < now && booking.status === BookingStatus.PAID;
+      // Show past bookings and all paid bookings regardless of date
+      return booking.status === BookingStatus.PAID || (sessionDate < now && booking.status !== BookingStatus.CANCELLED);
     }
   });
   

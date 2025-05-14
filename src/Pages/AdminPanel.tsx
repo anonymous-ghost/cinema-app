@@ -11,6 +11,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { sortFilms } from "../utils/filmSort";
 import AdminReviews from "../components/admin/AdminReviews";
 import ClearStorage from "../components/ClearStorage";
+import { useToast } from "../hooks/useToast";
 
 // Повний список жанрів
 const ALL_GENRES = [
@@ -186,9 +187,9 @@ export const MOCK_FILMS: Film[] = [
 
 //SESSIONS
 /*export*/ const MOCK_SESSIONS: Session[] = [
-  { id: "1", filmId: "1", date: "2025-04-20", time: "19:00", price: 120, hall: "IMAX" },
-  { id: "2", filmId: "1", date: "2025-04-20", time: "21:30", price: 120, hall: "Hall 2" },
-  { id: "3", filmId: "1", date: "2025-04-20", time: "21:30", price: 130, hall: "Hall 2" }
+  { id: "1", filmId: "1", date: "2025-04-20", time: "19:00", price: 120, hall: "IMAX", occupiedSeats: [] },
+  { id: "2", filmId: "1", date: "2025-04-20", time: "21:30", price: 120, hall: "Hall 2", occupiedSeats: [] },
+  { id: "3", filmId: "1", date: "2025-04-20", time: "21:30", price: 130, hall: "Hall 2", occupiedSeats: [] }
 ];
 
 
@@ -201,6 +202,7 @@ const AdminPanel: React.FC = () => {
   const { sessions, setSessions } = useSessions();
   const { isAdmin, isAuthenticated, currentUser } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const [isFilmDialogOpen, setIsFilmDialogOpen] = useState(false);
   const [isSessionDialogOpen, setIsSessionDialogOpen] = useState(false);
@@ -309,7 +311,22 @@ const AdminPanel: React.FC = () => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setPosterFile(file);
+      
+      // Create a temporary URL for preview
       setPosterPreview(URL.createObjectURL(file));
+      
+      // Also convert the file to base64 for storage in localStorage
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Store the base64 string in localStorage for later use
+        if (typeof reader.result === 'string') {
+          const imageKey = `poster_${Date.now()}`;
+          localStorage.setItem(imageKey, reader.result);
+          // Update the posterFile state to include the localStorage key
+          setPosterFile(Object.assign(file, { localStorageKey: imageKey }));
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
   // Save handlers
@@ -325,9 +342,21 @@ const AdminPanel: React.FC = () => {
       ? filmForm.cast 
       : (formatCastForInput(filmForm.cast)?.split(',').map(s => s.trim()).filter(Boolean) || []);
     
-    const posterUrl = posterFile 
-      ? posterPreview 
-      : (editingFilm?.posterUrl || "https://via.placeholder.com/300x450?text=No+Poster");
+    // Get the poster URL - either from localStorage or use existing URL
+    let posterUrl = editingFilm?.posterUrl || "https://via.placeholder.com/300x450?text=No+Poster";
+    
+    if (posterFile) {
+      // If we have a new poster file with a localStorage key, use that
+      if ((posterFile as any).localStorageKey) {
+        const storedImage = localStorage.getItem((posterFile as any).localStorageKey);
+        if (storedImage) {
+          posterUrl = storedImage;
+        }
+      } else {
+        // Fallback to the preview URL if no localStorage key
+        posterUrl = posterPreview;
+      }
+    }
     
     const newFilm: Film = {
       id: editingFilm?.id || `f${Date.now()}`,
@@ -355,23 +384,84 @@ const AdminPanel: React.FC = () => {
   const handleSaveSession = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!sessionForm.filmId || !sessionForm.date || !sessionForm.time || !sessionForm.hall) {
-      alert("Please fill in all required fields");
+    // Enhanced validation
+    if (!sessionForm.filmId) {
+      toast({
+        title: "Error",
+        description: "Please select a movie",
+        variant: "destructive"
+      });
       return;
     }
+    
+    if (!sessionForm.date) {
+      toast({
+        title: "Error",
+        description: "Please select a date",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!sessionForm.time) {
+      toast({
+        title: "Error",
+        description: "Please select a time",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!sessionForm.hall) {
+      toast({
+        title: "Error",
+        description: "Please select a hall",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!sessionForm.price || Number(sessionForm.price) <= 0) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid price",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Create the new session object
     const newSession: Session = {
       id: editingSession?.id || `s${Date.now()}`,
-      filmId: sessionForm.filmId || "",
-      date: sessionForm.date || "",
-      time: sessionForm.time || "",
-      price: Number(sessionForm.price) || 0,
-      hall: sessionForm.hall || ""
+      filmId: sessionForm.filmId,
+      date: sessionForm.date,
+      time: sessionForm.time,
+      price: Number(sessionForm.price),
+      hall: sessionForm.hall,
+      occupiedSeats: editingSession?.occupiedSeats || [] // Preserve existing occupied seats or use empty array
     };
     
-    setSessions(prev => editingSession 
-      ? prev.map(s => s.id === editingSession.id ? newSession : s) 
-      : [...prev, newSession]
-    );
+    // Update the sessions in context
+    setSessions(prev => {
+      const updatedSessions = editingSession 
+        ? prev.map(s => s.id === editingSession.id ? newSession : s) 
+        : [...prev, newSession];
+      
+      // Also update localStorage directly to ensure immediate synchronization
+      localStorage.setItem('sessions', JSON.stringify(updatedSessions));
+      
+      return updatedSessions;
+    });
+    
+    // Show success message
+    toast({
+      title: editingSession ? "Session Updated" : "Session Added",
+      description: editingSession 
+        ? `The session for ${films.find(f => f.id === newSession.filmId)?.title} has been updated.` 
+        : `A new session for ${films.find(f => f.id === newSession.filmId)?.title} has been added.`
+    });
+    
+    // Close the dialog
     setIsSessionDialogOpen(false);
   };
 
@@ -621,6 +711,26 @@ const AdminPanel: React.FC = () => {
                 </select>
               </div>
               
+              <div className="flex justify-end space-x-3 pt-4">
+                <button type="button" className="admin-btn admin-btn-secondary" onClick={() => setIsFilmDialogOpen(false)}>Cancel</button>
+                <button type="submit" className="admin-btn admin-btn-primary">Save</button>
+              </div>
+            </form>
+          </Dialog>
+
+          {/* Session Dialog */}
+          <Dialog open={isSessionDialogOpen} onOpenChange={setIsSessionDialogOpen} title={editingSession ? "Edit Session" : "Add Session"}>
+            <form onSubmit={handleSaveSession} className="space-y-4">
+              <div className="form-group">
+                <label className="form-label">Movie</label>
+                <select name="filmId" value={sessionForm.filmId} onChange={handleSessionFormChange} className="form-select" required>
+                  <option value="">Select a movie</option>
+                  {films.map(film => (
+                    <option key={film.id} value={film.id}>{film.title}</option>
+                  ))}
+                </select>
+              </div>
+
               <div className="form-group">
                 <label className="form-label">Date</label>
                 <div className="relative">

@@ -1,10 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useToast } from '../hooks/useToast';
+import { useAuth } from '../contexts/AuthContext';
 
 const ClearStorage: React.FC = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleClearStorage = () => {
     try {
@@ -39,16 +39,19 @@ const ClearStorage: React.FC = () => {
         }
       }
       
-      // Display success message
+      // Display success message first
       toast({
         title: "Cache cleared",
-        description: "All local storage data successfully cleared. The page will reload.",
+        description: "All local storage data successfully cleared. You will be logged out.",
       });
       
-      // Reload page to apply changes
+      // Log out the user
+      logout();
+      
+      // Force a complete page reload to ensure all content is refreshed
       setTimeout(() => {
-        window.location.reload();
-      }, 1500);
+        window.location.href = '/';
+      }, 1000);
     } catch (error) {
       console.error("Error clearing storage:", error);
       toast({

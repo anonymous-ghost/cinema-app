@@ -114,8 +114,8 @@ const MoviePage = () => {
 
   // Map our sessions to the expected format
   const mappedSessions = movieSessions.map(session => ({
-    id: parseInt(session.id),
-    movieId: parseInt(session.filmId),
+    id: session.id, // Keep as string to match with AdminPanel format
+    movieId: session.filmId, // Keep as string to match with AdminPanel format
     date: session.date,
     time: session.time,
     occupiedSeats: [] // Default value
